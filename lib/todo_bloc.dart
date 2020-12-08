@@ -10,10 +10,10 @@ class TodoBloc {
 
   TodoBloc() {
     getAllTodos();
-  }
 
-  final _todoListController = StreamController<List<Todo>>();
-  final _todoController = StreamController<Todo>();
+  }
+  final _todoListController = StreamController<List<Todo>>.broadcast();
+  final _todoController = StreamController<Todo>.broadcast();
   Stream<List<Todo>> get todoListStream => _todoListController.stream;
   Stream<Todo> get todoStream => _todoController.stream;
 
@@ -28,7 +28,7 @@ class TodoBloc {
   }
 
 //  Future<Todo> getTodoById(String id) async {
-  getTodoById(String id) async {
+  void getTodoById(String id) async {
     _todoController.sink.add(await DBProvider.db.getTodoById(id));
   }
 
