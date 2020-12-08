@@ -27,7 +27,8 @@ class TodoBloc {
     _todoListController.sink.add(await DBProvider.db.getAllTodos());
   }
 
-  Future<Todo> getTodoById(String id) async {
+//  Future<Todo> getTodoById(String id) async {
+  getTodoById(String id) async {
     _todoController.sink.add(await DBProvider.db.getTodoById(id));
   }
 

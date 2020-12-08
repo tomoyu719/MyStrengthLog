@@ -44,7 +44,6 @@ class ListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _bloc = Provider.of<TodoBloc>(context, listen: false);
-//    _bloc.addTodo();
     return Scaffold(
       appBar: AppBar(title: Text('list')),
       body: StreamBuilder<List<Todo>>(
@@ -85,7 +84,8 @@ class ListScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddEditScreen(),
+//              builder: (context) => AddEditScreen(),
+              builder: (_) => AddEditScreen(),
               fullscreenDialog: true,
             ));
           },
@@ -97,82 +97,70 @@ class ListScreen extends StatelessWidget {
 
 class AddEditScreen extends StatelessWidget {
   String id;
-//  Todo todo;
-//  String id ?? Uuid().v4();
-//  AddEditScreen([this.id = Todo('Uuid().v4()', DateTime.now(), '', '')]);
-
-  AddEditScreen({this.id});
+  AddEditScreen([this.id]);
   TextEditingController _titleController;
   TextEditingController _descriptionController;
 
   final _formKey = GlobalKey<FormState>();
 
-//  final todo = Provider.of<TodoBloc>(context, listen: false).getTodoById(id);
-
   @override
   Widget build(BuildContext context) {
-    final _bloc = Provider.of<TodoBloc>(context, listen: false);
-
+    final todo = Provider.of<TodoBloc>(context, listen: false).getTodoById(id);
     return Scaffold(
       appBar: AppBar(
         title: const Text('title'),
       ),
-      body: StreamBuilder<Todo>(
-          stream: _bloc.todoStream,
-          builder: (BuildContext context, AsyncSnapshot<Todo> todo) {
-            return Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    initialValue: todo.data.title ?? '',
-                    controller: _titleController,
-                    decoration: InputDecoration(
-                      hintText: 'title',
-                    ),
-                  ),
-                  TextFormField(
-                    initialValue: todo.data.description ?? '',
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      hintText: 'description',
-                    ),
-                  ),
-                  RaisedButton(
-                    onPressed: () async {
-                      final selectedDate = await showDatePicker(
-                        context: context,
-                        initialDate: todo.data.date ?? '',
-                        firstDate: DateTime(DateTime.now().year),
-                        lastDate: DateTime(DateTime.now().year + 1),
-                      );
-                      print(selectedDate);
-                    },
-                  ),
-                  RaisedButton(
-                    onPressed: (){
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              initialValue: todo.title ?? '',
+              controller: _titleController,
+              decoration: InputDecoration(
+                hintText: 'title',
+              ),
+            ),
+            TextFormField(
+              initialValue: todo.description ?? '',
+              controller: _descriptionController,
+              decoration: InputDecoration(
+                hintText: 'description',
+              ),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                final selectedDate = await showDatePicker(
+                  context: context,
+                  initialDate: todo.date ?? '',
+                  firstDate: DateTime(DateTime.now().year),
+                  lastDate: DateTime(DateTime.now().year + 1),
+                );
+//                print(selectedDate);
+              },
+            ),
+            RaisedButton(
+              onPressed: (){
 //                TodoBloc().addTodo();
 //                Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            )
-          }
-      ),
+              },
+            ),
+          ],
+        ),
+      )
     );
   }
 }
 
+
 class DetailScreen extends StatelessWidget {
 
-//  Todo todo;
   String id;
   DetailScreen({@required this.id});
 
   @override
   Widget build(BuildContext context) {
-    final _bloc = Provider.of<TodoBloc>(context, listen: false);
+    final todo = Provider.of<TodoBloc>(context, listen: false).getTodoById(id);
     return Scaffold(
         appBar: AppBar(
           title: const Text('detail'),
@@ -183,17 +171,16 @@ class DetailScreen extends StatelessWidget {
             Text("${todo.date}"),
             Text(todo.description),
           ]
-
         ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pop(context);
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AddEditScreen(todo),
+                builder: (context) => AddEditScreen(todo.id),
                 fullscreenDialog: true,
               ));
+          Navigator.pop(context);
         },
         child: const Icon(Icons.edit),
       ),
