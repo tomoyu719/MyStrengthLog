@@ -5,6 +5,7 @@ import 'models.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 class DBProvider {
   DBProvider._();
@@ -29,7 +30,6 @@ class DBProvider {
   }
 
   Future<void> _createTable(Database db, int version) async {
-
     return await db.execute(
         "CREATE TABLE $_tableName ("
             "id TEXT PRIMARY KEY,"
@@ -53,6 +53,17 @@ class DBProvider {
     var res = await db.query(_tableName, where: "id = ?", whereArgs: [id]);
     return res.isNotEmpty ? Todo.fromMap(res.first) : Null;
   }
+
+// カレンダー機能ができたらかく
+//  Future<Todo> getTodoByDate(String date) async {
+////    var formatter = DateFormat('yyyy/MM/dd');
+////    print(formatter.format(selectedDate));
+//    final formatedDate = DateFormat('yyyy/MM/dd').format(date);
+//    final db = await database;
+//    var res = await db.query(_tableName, where: "date = ?", whereArgs: [date]);
+//    return res.isNotEmpty ? Todo.fromMap(res.first) : Null;
+//  }
+
 
   addTodo(Todo todo) async {
     final db = await database;

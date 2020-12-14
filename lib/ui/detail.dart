@@ -8,46 +8,62 @@ import 'package:mystrengthlog/ui/add_edit.dart';
 
 class DetailScreen extends StatelessWidget {
 
-  String id;
-  DetailScreen({@required this.id});
+  DateTime date;
+  DetailScreen({@required this.date});
 
   @override
   Widget build(BuildContext context) {
     final _bloc = Provider.of<TodoBloc>(context, listen: false);
-    _bloc.getTodoById(id);
+    _bloc.getTodoByDate(date);
+//    _bloc.getAllTodos();
     return Scaffold(
       appBar: AppBar(
         title: const Text('detail'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: (){
+              print('edit button pushed');
+            },
+          )
+        ],
       ),
-      body: StreamBuilder<Todo>(
-          stream: _bloc.todoStream,
-          builder: (BuildContext context, AsyncSnapshot<Todo> todo) {
-            if (!todo.hasData) {
+      body: StreamBuilder<List<Todo>>(
+          stream: _bloc.todoDateStream,
+          builder: (BuildContext context, AsyncSnapshot<List<Todo>> todoList) {
+            if (!todoList.hasData) {
               return Center(child:CircularProgressIndicator());
             } else {
-              return Column(
-                  children: <Widget>[
-                    Text(todo.data.title),
-                    Text("${todo.data.date}"),
-                    Text(todo.data.description),
-                  ]
+              return ListView.builder(
+                itemCount: todoList.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Todo todo = todoList.data[index];
+                  return Dismissible(
+                    key: Key(todo.id),
+                    onDismissed: (direction) {
+
+                    },
+//                    background: Container(color: Colors.pinkAccent),
+                    child: ListTile(
+                      title: Text(todo.title),
+                      subtitle: Text(todo.description),
+                    )
+                  );
+                }
               );
             }
           }
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-//          print('pushed' * 10);
-          Navigator.pop(context);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddEditScreen(id),
-                fullscreenDialog: true,
-              ));
-//          print('pushed2' * 10);
-
+          print('fab pushed');
+//          Navigator.pop(context);
+//          Navigator.push(
+//              context,
+//              MaterialPageRoute(
+//                builder: (context) => AddEditScreen(id),
+//                fullscreenDialog: true,
+//              ));
         },
         child: const Icon(Icons.edit),
       ),

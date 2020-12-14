@@ -1,42 +1,63 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:mystrengthlog/db_provider.dart';
 import 'package:mystrengthlog/models.dart';
 
 class TodoBloc {
 
+  List<Todo> allTodos = [];
+  List<Todo> dateFilterdTodos = [];
+
   TodoBloc() {
     getAllTodos();
-
   }
+
   final _todoListController = StreamController<List<Todo>>.broadcast();
   final _todoController = StreamController<Todo>.broadcast();
+//  final _todoDateController = StreamController<List<Todo>>.broadcast();
+  final _todoDateController = StreamController<List<Todo>>();
+
   Stream<List<Todo>> get todoListStream => _todoListController.stream;
   Stream<Todo> get todoStream => _todoController.stream;
+  Stream<List<Todo>> get todoDateStream => _todoDateController.stream;
 
-  dispose() {
+  void getFilterdList(String name) {
+    final todos = allTodos.where((element) => element.title == name).toList();
+    _todoListController.sink.add(todos);
+  }
+
+  void dispose() {
     _todoListController.close();
     _todoController.close();
+    _todoDateController.close();
   }
 
-
-  Future<List<Todo>> getAllTodos() async {
-    _todoListController.sink.add(await DBProvider.db.getAllTodos());
+  void getAllTodos() async {
+    allTodos = await DBProvider.db.getAllTodos();
+    // descending order
+    allTodos.sort((b, a) => a.date.compareTo(b.date));
+    _todoListController.sink.add(allTodos);
   }
 
-//  Future<Todo> getTodoById(String id) async {
   void getTodoById(String id) async {
     _todoController.sink.add(await DBProvider.db.getTodoById(id));
   }
 
-  addTodo(Todo todo) {
-//  addTodo() {
-//    Todo todo = Todo(
-//        id: '2',
-//          date: DateTime.now(),
-//        title: 'b',
-//        description: 'aho2'
-//  );
+//  void getTodoByDate(DateTime date) async {
+  void getTodoByDate(DateTime date) {
+
+    dateFilterdTodos = allTodos.where((element) => element.date == date).toList();
+    _todoDateController.sink.add(dateFilterdTodos);
+//    _todoListController.sink.add(dateFilterdTodos);
+  }
+
+  void getTodoByName(String name) {
+
+  }
+
+  void addTodo(Todo todo) {
     DBProvider.db.addTodo(todo);
     getAllTodos();
   }
