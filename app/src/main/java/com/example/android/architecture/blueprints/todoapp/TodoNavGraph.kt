@@ -20,15 +20,16 @@ import android.app.Activity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberDrawerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -43,30 +44,28 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsScreen
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailScreen
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksScreen
-import com.example.android.architecture.blueprints.todoapp.util.AppModalDrawer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun TodoNavGraph(
-    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     startDestination: String = TodoDestinations.TASKS_ROUTE,
     navActions: TodoNavigationActions = remember(navController) {
         TodoNavigationActions(navController)
     }
 ) {
-    val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
+
     Scaffold(
         bottomBar = {
             BottomNavigation {
-                BottomNavigationItem(selected = true, onClick = { /*TODO*/ }, icon = { /*TODO*/ })
-            }
-            BottomNavigation {
-                BottomNavigationItem(selected = true, onClick = { /*TODO*/ }, icon = { /*TODO*/ })
+                val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
+                items.forEach { screen ->
+                    BottomNavigationItem(
+                        selected = currentRoute == screen.route,
+                        onClick = { navController.navigate(screen.route) },
+                        icon = { Icon(screen.icon, contentDescription = null) }
+                    )
+                }
             }
 
         }
@@ -82,20 +81,16 @@ fun TodoNavGraph(
                     navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
                 )
             ) { entry ->
-                AppModalDrawer(drawerState, currentRoute, navActions) {
-                    TasksScreen(
-                        userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
-                        onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
-                        onAddTask = { navActions.navigateToAddEditTask(R.string.add_task, null) },
-                        onTaskClick = { task -> navActions.navigateToTaskDetail(task.id) },
-                        openDrawer = { coroutineScope.launch { drawerState.open() } }
-                    )
-                }
+                TasksScreen(
+                    userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
+                    onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
+                    onAddTask = { navActions.navigateToAddEditTask(R.string.add_task, null) },
+                    onTaskClick = { task -> navActions.navigateToTaskDetail(task.id) },
+                )
+
             }
             composable(TodoDestinations.STATISTICS_ROUTE) {
-                AppModalDrawer(drawerState, currentRoute, navActions) {
-                    StatisticsScreen(openDrawer = { coroutineScope.launch { drawerState.open() } })
-                }
+                StatisticsScreen()
             }
             composable(
                 TodoDestinations.ADD_EDIT_TASK_ROUTE,
@@ -132,3 +127,15 @@ fun TodoNavGraph(
 const val ADD_EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 1
 const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
+
+//    sealed class Screen(val route: String, @StringRes val resourceId: Int) {
+sealed class Screen(val route: String, val icon: ImageVector) {
+    object Tasks : Screen(TodoDestinations.TASKS_ROUTE, Icons.Default.List)
+
+    object Statistics : Screen(TodoDestinations.STATISTICS_ROUTE, Icons.Default.Info)
+}
+
+val items = listOf(
+    Screen.Tasks,
+    Screen.Statistics,
+)
