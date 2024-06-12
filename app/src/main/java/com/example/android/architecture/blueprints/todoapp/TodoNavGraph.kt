@@ -17,11 +17,13 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.app.Activity
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
@@ -30,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -53,7 +56,6 @@ fun TodoNavGraph(
         TodoNavigationActions(navController)
     }
 ) {
-
     Scaffold(
         bottomBar = {
             BottomNavigation {
@@ -63,7 +65,8 @@ fun TodoNavGraph(
                     BottomNavigationItem(
                         selected = currentRoute == screen.route,
                         onClick = { navController.navigate(screen.route) },
-                        icon = { Icon(screen.icon, contentDescription = null) }
+                        icon = { Icon(screen.icon, contentDescription = null) },
+                        label = { Text(stringResource(screen.resourceId)) }
                     )
                 }
             }
@@ -129,10 +132,11 @@ const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
 
 //    sealed class Screen(val route: String, @StringRes val resourceId: Int) {
-sealed class Screen(val route: String, val icon: ImageVector) {
-    object Tasks : Screen(TodoDestinations.TASKS_ROUTE, Icons.Default.List)
+sealed class Screen(val route: String, val icon: ImageVector, @StringRes val resourceId: Int) {
+    object Tasks : Screen(TodoDestinations.TASKS_ROUTE, Icons.Default.List, R.string.list_title)
 
-    object Statistics : Screen(TodoDestinations.STATISTICS_ROUTE, Icons.Default.Info)
+    object Statistics :
+        Screen(TodoDestinations.STATISTICS_ROUTE, Icons.Default.Info, R.string.statistics_title)
 }
 
 val items = listOf(
