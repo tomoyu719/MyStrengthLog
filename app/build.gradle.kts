@@ -32,7 +32,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.example.android.architecture.blueprints.todoapp.CustomTestRunner"
+        testInstrumentationRunner =
+            "com.example.android.architecture.blueprints.todoapp.CustomTestRunner"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -46,14 +47,20 @@ android {
             isMinifyEnabled = false
             isTestCoverageEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            testProguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguardTest-rules.pro")
+            testProguardFiles(
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguardTest-rules.pro"
+            )
         }
 
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            testProguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguardTest-rules.pro")
+            testProguardFiles(
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguardTest-rules.pro"
+            )
         }
     }
 

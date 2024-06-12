@@ -18,9 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -34,13 +32,12 @@ import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import javax.inject.Inject
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Tests for scenarios that requires navigating within the app.
@@ -70,62 +67,24 @@ class AppNavigationTest {
     }
 
     @Test
-    fun drawerNavigationFromTasksToStatistics() {
+    fun bottomNavigationFromTasksToStatistics() {
         setContent()
 
-        openDrawer()
         // Start statistics screen.
         composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
+
         // Check that statistics screen was opened.
         composeTestRule.onNodeWithText(activity.getString(R.string.statistics_no_tasks))
             .assertIsDisplayed()
 
-        openDrawer()
         // Start tasks screen.
         composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).performClick()
+
         // Check that tasks screen was opened.
         composeTestRule.onNodeWithText(activity.getString(R.string.no_tasks_all))
             .assertIsDisplayed()
     }
 
-    @Test
-    fun tasksScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        setContent()
-
-        // Check that left drawer is closed at startup
-        composeTestRule.onNodeWithText(activity.getString(R.string.list_title))
-            .assertIsNotDisplayed()
-        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title))
-            .assertIsNotDisplayed()
-
-        openDrawer()
-
-        // Check if drawer is open
-        composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).assertIsDisplayed()
-        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun statsScreen_clickOnAndroidHomeIcon_OpensNavigation() {
-        setContent()
-
-        // When the user navigates to the stats screen
-        openDrawer()
-        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
-
-        composeTestRule.onNodeWithText(activity.getString(R.string.list_title))
-            .assertIsNotDisplayed()
-
-        openDrawer()
-
-        // Check if drawer is open
-        composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).assertIsDisplayed()
-        assertTrue(
-            composeTestRule.onAllNodesWithText(activity.getString(R.string.statistics_title))
-                .fetchSemanticsNodes().isNotEmpty()
-        )
-    }
 
     @Test
     fun taskDetailScreen_doubleUIBackButton() = runTest {
@@ -185,10 +144,5 @@ class AppNavigationTest {
                 TodoNavGraph()
             }
         }
-    }
-
-    private fun openDrawer() {
-        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.open_drawer))
-            .performClick()
     }
 }
