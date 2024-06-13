@@ -71,7 +71,6 @@ fun TasksScreen(
     onAddTask: () -> Unit,
     onTaskClick: (Task) -> Unit,
     onUserMessageDisplayed: () -> Unit,
-    openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = hiltViewModel(),
     scaffoldState: ScaffoldState = rememberScaffoldState()
@@ -80,7 +79,6 @@ fun TasksScreen(
         scaffoldState = scaffoldState,
         topBar = {
             TasksTopAppBar(
-                openDrawer = openDrawer,
                 onFilterAllTasks = { viewModel.setFiltering(ALL_TASKS) },
                 onFilterActiveTasks = { viewModel.setFiltering(ACTIVE_TASKS) },
                 onFilterCompletedTasks = { viewModel.setFiltering(COMPLETED_TASKS) },
