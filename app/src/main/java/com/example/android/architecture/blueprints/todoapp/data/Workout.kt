@@ -17,17 +17,17 @@
 package com.example.android.architecture.blueprints.todoapp.data
 
 /**
- * Immutable model class for a Task.
+ * Immutable model class for a Workout.
  *
- * @param title title of the task
- * @param description description of the task
- * @param isCompleted whether or not this task is completed
- * @param id id of the task
+ * @param title title of the workout
+ * @param description description of the workout
+ * @param isCompleted whether or not this workout is completed
+ * @param id id of the workout
  *
  * TODO: The constructor of this class should be `internal` but it is used in previews and tests
  *  so that's not possible until those previews/tests are refactored.
  */
-data class Task(
+data class Workout(
     val title: String = "",
     val description: String = "",
     val isCompleted: Boolean = false,

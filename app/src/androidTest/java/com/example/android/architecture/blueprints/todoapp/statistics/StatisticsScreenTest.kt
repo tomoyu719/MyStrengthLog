@@ -24,7 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -53,7 +53,7 @@ class StatisticsScreenTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var repository: TaskRepository
+    lateinit var repository: WorkoutRepository
 
     @Before
     fun setup() {
@@ -61,12 +61,12 @@ class StatisticsScreenTest {
     }
 
     @Test
-    fun tasks_showsNonEmptyMessage() = runTest {
-        // Given some tasks
+    fun workouts_showsNonEmptyMessage() = runTest {
+        // Given some workouts
         repository.apply {
-            createTask("Title1", "Description1")
-            createTask("Title2", "Description2").also {
-                completeTask(it)
+            createWorkout("Title1", "Description1")
+            createWorkout("Title2", "Description2").also {
+                completeWorkout(it)
             }
         }
 
@@ -80,12 +80,12 @@ class StatisticsScreenTest {
             }
         }
 
-        val expectedActiveTaskText = activity.getString(R.string.statistics_active_tasks, 50.0f)
-        val expectedCompletedTaskText = activity
-            .getString(R.string.statistics_completed_tasks, 50.0f)
+        val expectedActiveWorkoutText = activity.getString(R.string.statistics_active_workouts, 50.0f)
+        val expectedCompletedWorkoutText = activity
+            .getString(R.string.statistics_completed_workouts, 50.0f)
 
         // check that both info boxes are displayed and contain the correct info
-        composeTestRule.onNodeWithText(expectedActiveTaskText).assertIsDisplayed()
-        composeTestRule.onNodeWithText(expectedCompletedTaskText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedActiveWorkoutText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expectedCompletedWorkoutText).assertIsDisplayed()
     }
 }

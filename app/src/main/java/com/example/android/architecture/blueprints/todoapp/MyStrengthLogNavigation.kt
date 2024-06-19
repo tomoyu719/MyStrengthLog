@@ -18,52 +18,52 @@ package com.example.android.architecture.blueprints.todoapp
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.TASK_ID_ARG
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.TITLE_ARG
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.USER_MESSAGE_ARG
-import com.example.android.architecture.blueprints.todoapp.TodoScreens.ADD_EDIT_TASK_SCREEN
-import com.example.android.architecture.blueprints.todoapp.TodoScreens.STATISTICS_SCREEN
-import com.example.android.architecture.blueprints.todoapp.TodoScreens.TASKS_SCREEN
-import com.example.android.architecture.blueprints.todoapp.TodoScreens.TASK_DETAIL_SCREEN
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs.WORKOUT_ID_ARG
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs.TITLE_ARG
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs.USER_MESSAGE_ARG
+import com.example.android.architecture.blueprints.todoapp.MyStrengthLogScreens.ADD_EDIT_WORKOUT_SCREEN
+import com.example.android.architecture.blueprints.todoapp.MyStrengthLogScreens.STATISTICS_SCREEN
+import com.example.android.architecture.blueprints.todoapp.MyStrengthLogScreens.WORKOUTS_SCREEN
+import com.example.android.architecture.blueprints.todoapp.MyStrengthLogScreens.WORKOUT_DETAIL_SCREEN
 
 /**
- * Screens used in [TodoDestinations]
+ * Screens used in [MyStrengthLogDestinations]
  */
-private object TodoScreens {
-    const val TASKS_SCREEN = "tasks"
+private object MyStrengthLogScreens {
+    const val WORKOUTS_SCREEN = "workouts"
     const val STATISTICS_SCREEN = "statistics"
-    const val TASK_DETAIL_SCREEN = "task"
-    const val ADD_EDIT_TASK_SCREEN = "addEditTask"
+    const val WORKOUT_DETAIL_SCREEN = "workout"
+    const val ADD_EDIT_WORKOUT_SCREEN = "addEditWorkout"
 }
 
 /**
- * Arguments used in [TodoDestinations] routes
+ * Arguments used in [MyStrengthLogDestinations] routes
  */
-object TodoDestinationsArgs {
+object WorkoutDestinationsArgs {
     const val USER_MESSAGE_ARG = "userMessage"
-    const val TASK_ID_ARG = "taskId"
+    const val WORKOUT_ID_ARG = "workoutId"
     const val TITLE_ARG = "title"
 }
 
 /**
- * Destinations used in the [TodoActivity]
+ * Destinations used in the [MyStrengthLogActivity]
  */
-object TodoDestinations {
-    const val TASKS_ROUTE = "$TASKS_SCREEN?$USER_MESSAGE_ARG={$USER_MESSAGE_ARG}"
+object MyStrengthLogDestinations {
+    const val WORKOUTS_ROUTE = "$WORKOUTS_SCREEN?$USER_MESSAGE_ARG={$USER_MESSAGE_ARG}"
     const val STATISTICS_ROUTE = STATISTICS_SCREEN
-    const val TASK_DETAIL_ROUTE = "$TASK_DETAIL_SCREEN/{$TASK_ID_ARG}"
-    const val ADD_EDIT_TASK_ROUTE = "$ADD_EDIT_TASK_SCREEN/{$TITLE_ARG}?$TASK_ID_ARG={$TASK_ID_ARG}"
+    const val WORKOUT_DETAIL_ROUTE = "$WORKOUT_DETAIL_SCREEN/{$WORKOUT_ID_ARG}"
+    const val ADD_EDIT_WORKOUT_ROUTE = "$ADD_EDIT_WORKOUT_SCREEN/{$TITLE_ARG}?$WORKOUT_ID_ARG={$WORKOUT_ID_ARG}"
 }
 
 /**
  * Models the navigation actions in the app.
  */
-class TodoNavigationActions(private val navController: NavHostController) {
+class MyStrengthLogNavigationActions(private val navController: NavHostController) {
 
-    fun navigateToTasks(userMessage: Int = 0) {
+    fun navigateToWorkouts(userMessage: Int = 0) {
         val navigatesFromDrawer = userMessage == 0
         navController.navigate(
-            TASKS_SCREEN.let {
+            WORKOUTS_SCREEN.let {
                 if (userMessage != 0) "$it?$USER_MESSAGE_ARG=$userMessage" else it
             }
         ) {
@@ -77,7 +77,7 @@ class TodoNavigationActions(private val navController: NavHostController) {
     }
 
     fun navigateToStatistics() {
-        navController.navigate(TodoDestinations.STATISTICS_ROUTE) {
+        navController.navigate(MyStrengthLogDestinations.STATISTICS_ROUTE) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items
@@ -92,14 +92,14 @@ class TodoNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToTaskDetail(taskId: String) {
-        navController.navigate("$TASK_DETAIL_SCREEN/$taskId")
+    fun navigateToWorkoutDetail(workoutId: String) {
+        navController.navigate("$WORKOUT_DETAIL_SCREEN/$workoutId")
     }
 
-    fun navigateToAddEditTask(title: Int, taskId: String?) {
+    fun navigateToAddEditWorkout(title: Int, workoutId: String?) {
         navController.navigate(
-            "$ADD_EDIT_TASK_SCREEN/$title".let {
-                if (taskId != null) "$it?$TASK_ID_ARG=$taskId" else it
+            "$ADD_EDIT_WORKOUT_SCREEN/$title".let {
+                if (workoutId != null) "$it?$WORKOUT_ID_ARG=$workoutId" else it
             }
         )
     }

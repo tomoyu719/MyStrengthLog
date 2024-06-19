@@ -22,89 +22,89 @@ import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Data Access Object for the task table.
+ * Data Access Object for the workout table.
  */
 @Dao
-interface TaskDao {
+interface WorkoutDao {
 
     /**
-     * Observes list of tasks.
+     * Observes list of workouts.
      *
-     * @return all tasks.
+     * @return all workouts.
      */
-    @Query("SELECT * FROM task")
-    fun observeAll(): Flow<List<LocalTask>>
+    @Query("SELECT * FROM workout")
+    fun observeAll(): Flow<List<LocalWorkout>>
 
     /**
-     * Observes a single task.
+     * Observes a single workout.
      *
-     * @param taskId the task id.
-     * @return the task with taskId.
+     * @param workoutId the  id.
+     * @return the  with Id.
      */
-    @Query("SELECT * FROM task WHERE id = :taskId")
-    fun observeById(taskId: String): Flow<LocalTask>
+    @Query("SELECT * FROM workout WHERE id = :workoutId")
+    fun observeById(workoutId: String): Flow<LocalWorkout>
 
     /**
-     * Select all tasks from the tasks table.
+     * Select all s from the s table.
      *
-     * @return all tasks.
+     * @return all s.
      */
-    @Query("SELECT * FROM task")
-    suspend fun getAll(): List<LocalTask>
+    @Query("SELECT * FROM workout")
+    suspend fun getAll(): List<LocalWorkout>
 
     /**
-     * Select a task by id.
+     * Select a workout by id.
      *
-     * @param taskId the task id.
-     * @return the task with taskId.
+     * @param workoutId the workout id.
+     * @return the workout with workoutId.
      */
-    @Query("SELECT * FROM task WHERE id = :taskId")
-    suspend fun getById(taskId: String): LocalTask?
+    @Query("SELECT * FROM workout WHERE id = :workoutId")
+    suspend fun getById(workoutId: String): LocalWorkout?
 
     /**
-     * Insert or update a task in the database. If a task already exists, replace it.
+     * Insert or update a workout in the database. If a workout already exists, replace it.
      *
-     * @param task the task to be inserted or updated.
-     */
-    @Upsert
-    suspend fun upsert(task: LocalTask)
-
-    /**
-     * Insert or update tasks in the database. If a task already exists, replace it.
-     *
-     * @param tasks the tasks to be inserted or updated.
+     * @param workout the workout to be inserted or updated.
      */
     @Upsert
-    suspend fun upsertAll(tasks: List<LocalTask>)
+    suspend fun upsert(workout: LocalWorkout)
 
     /**
-     * Update the complete status of a task
+     * Insert or update workouts in the database. If a workout already exists, replace it.
      *
-     * @param taskId id of the task
+     * @param workouts the workouts to be inserted or updated.
+     */
+    @Upsert
+    suspend fun upsertAll(workouts: List<LocalWorkout>)
+
+    /**
+     * Update the complete status of a workout
+     *
+     * @param workoutId id of the workout
      * @param completed status to be updated
      */
-    @Query("UPDATE task SET isCompleted = :completed WHERE id = :taskId")
-    suspend fun updateCompleted(taskId: String, completed: Boolean)
+    @Query("UPDATE workout SET isCompleted = :completed WHERE id = :workoutId")
+    suspend fun updateCompleted(workoutId: String, completed: Boolean)
 
     /**
-     * Delete a task by id.
+     * Delete a workout by id.
      *
-     * @return the number of tasks deleted. This should always be 1.
+     * @return the number of workouts deleted. This should always be 1.
      */
-    @Query("DELETE FROM task WHERE id = :taskId")
-    suspend fun deleteById(taskId: String): Int
+    @Query("DELETE FROM workout WHERE id = :workoutId")
+    suspend fun deleteById(workoutId: String): Int
 
     /**
-     * Delete all tasks.
+     * Delete all workouts.
      */
-    @Query("DELETE FROM task")
+    @Query("DELETE FROM workout")
     suspend fun deleteAll()
 
     /**
-     * Delete all completed tasks from the table.
+     * Delete all completed workouts from the table.
      *
-     * @return the number of tasks deleted.
+     * @return the number of workouts deleted.
      */
-    @Query("DELETE FROM task WHERE isCompleted = 1")
+    @Query("DELETE FROM workout WHERE isCompleted = 1")
     suspend fun deleteCompleted(): Int
 }

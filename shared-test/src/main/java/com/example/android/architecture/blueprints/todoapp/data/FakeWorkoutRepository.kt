@@ -27,16 +27,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 /**
- * Implementation of a tasks repository with static access to the data for easy testing.
+ * Implementation of a workouts repository with static access to the data for easy testing.
  */
-class FakeTaskRepository : TaskRepository {
+class FakeWorkoutRepository : WorkoutRepository {
 
     private var shouldThrowError = false
 
-    private val _savedTasks = MutableStateFlow(LinkedHashMap<String, Task>())
-    val savedTasks: StateFlow<LinkedHashMap<String, Task>> = _savedTasks.asStateFlow()
+    private val _savedWorkouts = MutableStateFlow(LinkedHashMap<String, Workout>())
+    val savedWorkouts: StateFlow<LinkedHashMap<String, Workout>> = _savedWorkouts.asStateFlow()
 
-    private val observableTasks: Flow<List<Task>> = savedTasks.map {
+    private val observableWorkouts: Flow<List<Workout>> = savedWorkouts.map {
         if (shouldThrowError) {
             throw Exception("Test exception")
         } else {
@@ -49,104 +49,104 @@ class FakeTaskRepository : TaskRepository {
     }
 
     override suspend fun refresh() {
-        // Tasks already refreshed
+        // Workouts already refreshed
     }
 
-    override suspend fun refreshTask(taskId: String) {
+    override suspend fun refreshWorkout(workoutId: String) {
         refresh()
     }
 
-    override suspend fun createTask(title: String, description: String): String {
-        val taskId = generateTaskId()
-        Task(title = title, description = description, id = taskId).also {
-            saveTask(it)
+    override suspend fun createWorkout(title: String, description: String): String {
+        val workoutId = generateWorkoutId()
+        Workout(title = title, description = description, id = workoutId).also {
+            saveWorkout(it)
         }
-        return taskId
+        return workoutId
     }
 
-    override fun getTasksStream(): Flow<List<Task>> = observableTasks
+    override fun getWorkoutsStream(): Flow<List<Workout>> = observableWorkouts
 
-    override fun getTaskStream(taskId: String): Flow<Task?> {
-        return observableTasks.map { tasks ->
-            return@map tasks.firstOrNull { it.id == taskId }
+    override fun getWorkoutStream(workoutId: String): Flow<Workout?> {
+        return observableWorkouts.map { workouts ->
+            return@map workouts.firstOrNull { it.id == workoutId }
         }
     }
 
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
+    override suspend fun getWorkout(workoutId: String, forceUpdate: Boolean): Workout? {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }
-        return savedTasks.value[taskId]
+        return savedWorkouts.value[workoutId]
     }
 
-    override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
+    override suspend fun getWorkouts(forceUpdate: Boolean): List<Workout> {
         if (shouldThrowError) {
             throw Exception("Test exception")
         }
-        return observableTasks.first()
+        return observableWorkouts.first()
     }
 
-    override suspend fun updateTask(taskId: String, title: String, description: String) {
-        val updatedTask = _savedTasks.value[taskId]?.copy(
+    override suspend fun updateWorkout(workoutId: String, title: String, description: String) {
+        val updatedWorkout = _savedWorkouts.value[workoutId]?.copy(
             title = title,
             description = description
-        ) ?: throw Exception("Task (id $taskId) not found")
+        ) ?: throw Exception("Workout (id $workoutId) not found")
 
-        saveTask(updatedTask)
+        saveWorkout(updatedWorkout)
     }
 
-    private fun saveTask(task: Task) {
-        _savedTasks.update { tasks ->
-            val newTasks = LinkedHashMap<String, Task>(tasks)
-            newTasks[task.id] = task
-            newTasks
+    private fun saveWorkout(workout: Workout) {
+        _savedWorkouts.update { workouts ->
+            val newWorkouts = LinkedHashMap<String, Workout>(workouts)
+            newWorkouts[workout.id] = workout
+            newWorkouts
         }
     }
 
-    override suspend fun completeTask(taskId: String) {
-        _savedTasks.value[taskId]?.let {
-            saveTask(it.copy(isCompleted = true))
+    override suspend fun completeWorkout(workoutId: String) {
+        _savedWorkouts.value[workoutId]?.let {
+            saveWorkout(it.copy(isCompleted = true))
         }
     }
 
-    override suspend fun activateTask(taskId: String) {
-        _savedTasks.value[taskId]?.let {
-            saveTask(it.copy(isCompleted = false))
+    override suspend fun activateWorkout(workoutId: String) {
+        _savedWorkouts.value[workoutId]?.let {
+            saveWorkout(it.copy(isCompleted = false))
         }
     }
 
-    override suspend fun clearCompletedTasks() {
-        _savedTasks.update { tasks ->
-            tasks.filterValues {
+    override suspend fun clearCompletedWorkouts() {
+        _savedWorkouts.update { workouts ->
+            workouts.filterValues {
                 !it.isCompleted
-            } as LinkedHashMap<String, Task>
+            } as LinkedHashMap<String, Workout>
         }
     }
 
-    override suspend fun deleteTask(taskId: String) {
-        _savedTasks.update { tasks ->
-            val newTasks = LinkedHashMap<String, Task>(tasks)
-            newTasks.remove(taskId)
-            newTasks
+    override suspend fun deleteWorkout(workoutId: String) {
+        _savedWorkouts.update { workouts ->
+            val newWorkouts = LinkedHashMap<String, Workout>(workouts)
+            newWorkouts.remove(workoutId)
+            newWorkouts
         }
     }
 
-    override suspend fun deleteAllTasks() {
-        _savedTasks.update {
+    override suspend fun deleteAllWorkouts() {
+        _savedWorkouts.update {
             LinkedHashMap()
         }
     }
 
-    private fun generateTaskId() = UUID.randomUUID().toString()
+    private fun generateWorkoutId() = UUID.randomUUID().toString()
 
     @VisibleForTesting
-    fun addTasks(vararg tasks: Task) {
-        _savedTasks.update { oldTasks ->
-            val newTasks = LinkedHashMap<String, Task>(oldTasks)
-            for (task in tasks) {
-                newTasks[task.id] = task
+    fun addWorkouts(vararg workouts: Workout) {
+        _savedWorkouts.update { oldWorkouts ->
+            val newWorkouts = LinkedHashMap<String, Workout>(oldWorkouts)
+            for (workout in workouts) {
+                newWorkouts[workout.id] = workout
             }
-            newTasks
+            newWorkouts
         }
     }
 }

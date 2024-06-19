@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.addedittask
+package com.example.android.architecture.blueprints.todoapp.addeditworkout
 
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -32,7 +32,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -46,13 +46,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Integration test for the Add Task screen.
+ * Integration test for the Add Workout screen.
  */
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @HiltAndroidTest
 @ExperimentalCoroutinesApi
-class AddEditTaskScreenTest {
+class AddEditWorkoutScreenTest {
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -62,20 +62,20 @@ class AddEditTaskScreenTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var repository: TaskRepository
+    lateinit var repository: WorkoutRepository
 
     @Before
     fun setup() {
         hiltRule.inject()
 
-        // GIVEN - On the "Add Task" screen.
+        // GIVEN - On the "Add Workout" screen.
         composeTestRule.setContent {
             AppCompatTheme {
                 Surface {
-                    AddEditTaskScreen(
-                        viewModel = AddEditTaskViewModel(repository, SavedStateHandle()),
-                        topBarTitle = R.string.add_task,
-                        onTaskUpdate = { },
+                    AddEditWorkoutScreen(
+                        viewModel = AddEditWorkoutViewModel(repository, SavedStateHandle()),
+                        topBarTitle = R.string.add_workout,
+                        onWorkoutUpdate = { },
                         onBack = { },
                     )
                 }
@@ -84,32 +84,32 @@ class AddEditTaskScreenTest {
     }
 
     @Test
-    fun emptyTask_isNotSaved() {
+    fun emptyWorkout_isNotSaved() {
         // WHEN - Enter invalid title and description combination and click save
         findTextField(R.string.title_hint).performTextClearance()
         findTextField(R.string.description_hint).performTextClearance()
-        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_workout))
             .performClick()
 
-        // THEN - Entered Task is still displayed (a correct task would close it).
+        // THEN - Entered Workout is still displayed (a correct workout would close it).
         composeTestRule
-            .onNodeWithText(activity.getString(R.string.empty_task_message))
+            .onNodeWithText(activity.getString(R.string.empty_workout_message))
             .assertIsDisplayed()
     }
 
     @Test
-    fun validTask_isSaved() = runTest {
+    fun validWorkout_isSaved() = runTest {
         // WHEN - Valid title and description combination and click save
         findTextField(R.string.title_hint).performTextInput("title")
         findTextField(R.string.description_hint).performTextInput("description")
-        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_task))
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.cd_save_workout))
             .performClick()
 
-        // THEN - Verify that the repository saved the task
-        val tasks = repository.getTasks(true)
-        assertEquals(1, tasks.size)
-        assertEquals("title", tasks[0].title)
-        assertEquals("description", tasks[0].description)
+        // THEN - Verify that the repository saved the workout
+        val workouts = repository.getWorkouts(true)
+        assertEquals(1, workouts.size)
+        assertEquals("title", workouts[0].title)
+        assertEquals("description", workouts[0].description)
     }
 
     private fun findTextField(text: Int): SemanticsNodeInteraction {

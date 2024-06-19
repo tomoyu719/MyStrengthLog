@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.workouts
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -56,54 +56,54 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
+import com.example.android.architecture.blueprints.todoapp.data.Workout
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsFilterType.ACTIVE_WORKOUTS
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsFilterType.ALL_WORKOUTS
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsFilterType.COMPLETED_WORKOUTS
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
-import com.example.android.architecture.blueprints.todoapp.util.TasksTopAppBar
+import com.example.android.architecture.blueprints.todoapp.util.WorkoutsTopAppBar
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun TasksScreen(
-    @StringRes userMessage: Int,
-    onAddTask: () -> Unit,
-    onTaskClick: (Task) -> Unit,
-    onUserMessageDisplayed: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: TasksViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+fun WorkoutsScreen(
+        @StringRes userMessage: Int,
+        onAddWorkout: () -> Unit,
+        onWorkoutClick: (Workout) -> Unit,
+        onUserMessageDisplayed: () -> Unit,
+        modifier: Modifier = Modifier,
+        viewModel: WorkoutsViewModel = hiltViewModel(),
+        scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            TasksTopAppBar(
-                onFilterAllTasks = { viewModel.setFiltering(ALL_TASKS) },
-                onFilterActiveTasks = { viewModel.setFiltering(ACTIVE_TASKS) },
-                onFilterCompletedTasks = { viewModel.setFiltering(COMPLETED_TASKS) },
-                onClearCompletedTasks = { viewModel.clearCompletedTasks() },
+            WorkoutsTopAppBar(
+                onFilterAllWorkouts = { viewModel.setFiltering(ALL_WORKOUTS) },
+                onFilterActiveWorkouts = { viewModel.setFiltering(ACTIVE_WORKOUTS) },
+                onFilterCompletedWorkouts = { viewModel.setFiltering(COMPLETED_WORKOUTS) },
+                onClearCompletedWorkouts = { viewModel.clearCompletedWorkouts() },
                 onRefresh = { viewModel.refresh() }
             )
         },
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddTask) {
-                Icon(Icons.Filled.Add, stringResource(id = R.string.add_task))
+            FloatingActionButton(onClick = onAddWorkout) {
+                Icon(Icons.Filled.Add, stringResource(id = R.string.add_workout))
             }
         }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        TasksContent(
+        WorkoutsContent(
             loading = uiState.isLoading,
-            tasks = uiState.items,
+            workouts = uiState.items,
             currentFilteringLabel = uiState.filteringUiInfo.currentFilteringLabel,
-            noTasksLabel = uiState.filteringUiInfo.noTasksLabel,
-            noTasksIconRes = uiState.filteringUiInfo.noTaskIconRes,
+            noWorkoutsLabel = uiState.filteringUiInfo.noWorkoutsLabel,
+            noWorkoutsIconRes = uiState.filteringUiInfo.noWorkoutIconRes,
             onRefresh = viewModel::refresh,
-            onTaskClick = onTaskClick,
-            onTaskCheckedChange = viewModel::completeTask,
+            onWorkoutClick = onWorkoutClick,
+            onWorkoutCheckedChange = viewModel::completeWorkout,
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -128,21 +128,21 @@ fun TasksScreen(
 }
 
 @Composable
-private fun TasksContent(
-    loading: Boolean,
-    tasks: List<Task>,
-    @StringRes currentFilteringLabel: Int,
-    @StringRes noTasksLabel: Int,
-    @DrawableRes noTasksIconRes: Int,
-    onRefresh: () -> Unit,
-    onTaskClick: (Task) -> Unit,
-    onTaskCheckedChange: (Task, Boolean) -> Unit,
-    modifier: Modifier = Modifier
+private fun WorkoutsContent(
+        loading: Boolean,
+        workouts: List<Workout>,
+        @StringRes currentFilteringLabel: Int,
+        @StringRes noWorkoutsLabel: Int,
+        @DrawableRes noWorkoutsIconRes: Int,
+        onRefresh: () -> Unit,
+        onWorkoutClick: (Workout) -> Unit,
+        onWorkoutCheckedChange: (Workout, Boolean) -> Unit,
+        modifier: Modifier = Modifier
 ) {
     LoadingContent(
         loading = loading,
-        empty = tasks.isEmpty() && !loading,
-        emptyContent = { TasksEmptyContent(noTasksLabel, noTasksIconRes, modifier) },
+        empty = workouts.isEmpty() && !loading,
+        emptyContent = { WorkoutsEmptyContent(noWorkoutsLabel, noWorkoutsIconRes, modifier) },
         onRefresh = onRefresh
     ) {
         Column(
@@ -159,11 +159,11 @@ private fun TasksContent(
                 style = MaterialTheme.typography.h6
             )
             LazyColumn {
-                items(tasks) { task ->
-                    TaskItem(
-                        task = task,
-                        onTaskClick = onTaskClick,
-                        onCheckedChange = { onTaskCheckedChange(task, it) }
+                items(workouts) { workout ->
+                    WorkoutItem(
+                        workout = workout,
+                        onWorkoutClick = onWorkoutClick,
+                        onCheckedChange = { onWorkoutCheckedChange(workout, it) }
                     )
                 }
             }
@@ -172,10 +172,10 @@ private fun TasksContent(
 }
 
 @Composable
-private fun TaskItem(
-    task: Task,
-    onCheckedChange: (Boolean) -> Unit,
-    onTaskClick: (Task) -> Unit
+private fun WorkoutItem(
+        workout: Workout,
+        onCheckedChange: (Boolean) -> Unit,
+        onWorkoutClick: (Workout) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -185,19 +185,19 @@ private fun TaskItem(
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.list_item_padding),
             )
-            .clickable { onTaskClick(task) }
+            .clickable { onWorkoutClick(workout) }
     ) {
         Checkbox(
-            checked = task.isCompleted,
+            checked = workout.isCompleted,
             onCheckedChange = onCheckedChange
         )
         Text(
-            text = task.titleForList,
+            text = workout.titleForList,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
                 start = dimensionResource(id = R.dimen.horizontal_margin)
             ),
-            textDecoration = if (task.isCompleted) {
+            textDecoration = if (workout.isCompleted) {
                 TextDecoration.LineThrough
             } else {
                 null
@@ -207,10 +207,10 @@ private fun TaskItem(
 }
 
 @Composable
-private fun TasksEmptyContent(
-    @StringRes noTasksLabel: Int,
-    @DrawableRes noTasksIconRes: Int,
-    modifier: Modifier = Modifier
+private fun WorkoutsEmptyContent(
+        @StringRes noWorkoutsLabel: Int,
+        @DrawableRes noWorkoutsIconRes: Int,
+        modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -218,47 +218,47 @@ private fun TasksEmptyContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = noTasksIconRes),
-            contentDescription = stringResource(R.string.no_tasks_image_content_description),
+            painter = painterResource(id = noWorkoutsIconRes),
+            contentDescription = stringResource(R.string.no_workouts_image_content_description),
             modifier = Modifier.size(96.dp)
         )
-        Text(stringResource(id = noTasksLabel))
+        Text(stringResource(id = noWorkoutsLabel))
     }
 }
 
 @Preview
 @Composable
-private fun TasksContentPreview() {
+private fun WorkoutsContentPreview() {
     AppCompatTheme {
         Surface {
-            TasksContent(
+            WorkoutsContent(
                 loading = false,
-                tasks = listOf(
-                    Task(
+                workouts = listOf(
+                    Workout(
                         title = "Title 1",
                         description = "Description 1",
                         isCompleted = false,
                         id = "ID 1"
                     ),
-                    Task(
+                    Workout(
                         title = "Title 2",
                         description = "Description 2",
                         isCompleted = true,
                         id = "ID 2"
                     ),
-                    Task(
+                    Workout(
                         title = "Title 3",
                         description = "Description 3",
                         isCompleted = true,
                         id = "ID 3"
                     ),
-                    Task(
+                    Workout(
                         title = "Title 4",
                         description = "Description 4",
                         isCompleted = false,
                         id = "ID 4"
                     ),
-                    Task(
+                    Workout(
                         title = "Title 5",
                         description = "Description 5",
                         isCompleted = true,
@@ -266,11 +266,11 @@ private fun TasksContentPreview() {
                     ),
                 ),
                 currentFilteringLabel = R.string.label_all,
-                noTasksLabel = R.string.no_tasks_all,
-                noTasksIconRes = R.drawable.logo_no_fill,
+                noWorkoutsLabel = R.string.no_workouts_all,
+                noWorkoutsIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
-                onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onWorkoutClick = { },
+                onWorkoutCheckedChange = { _, _ -> },
             )
         }
     }
@@ -278,18 +278,18 @@ private fun TasksContentPreview() {
 
 @Preview
 @Composable
-private fun TasksContentEmptyPreview() {
+private fun WorkoutsContentEmptyPreview() {
     AppCompatTheme {
         Surface {
-            TasksContent(
+            WorkoutsContent(
                 loading = false,
-                tasks = emptyList(),
+                workouts = emptyList(),
                 currentFilteringLabel = R.string.label_all,
-                noTasksLabel = R.string.no_tasks_all,
-                noTasksIconRes = R.drawable.logo_no_fill,
+                noWorkoutsLabel = R.string.no_workouts_all,
+                noWorkoutsIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
-                onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onWorkoutClick = { },
+                onWorkoutCheckedChange = { _, _ -> },
             )
         }
     }
@@ -297,12 +297,12 @@ private fun TasksContentEmptyPreview() {
 
 @Preview
 @Composable
-private fun TasksEmptyContentPreview() {
+private fun WorkoutsEmptyContentPreview() {
     AppCompatTheme {
         Surface {
-            TasksEmptyContent(
-                noTasksLabel = R.string.no_tasks_all,
-                noTasksIconRes = R.drawable.logo_no_fill
+            WorkoutsEmptyContent(
+                noWorkoutsLabel = R.string.no_workouts_all,
+                noWorkoutsIconRes = R.drawable.logo_no_fill
             )
         }
     }
@@ -310,16 +310,16 @@ private fun TasksEmptyContentPreview() {
 
 @Preview
 @Composable
-private fun TaskItemPreview() {
+private fun WorkoutItemPreview() {
     AppCompatTheme {
         Surface {
-            TaskItem(
-                task = Task(
+            WorkoutItem(
+                workout = Workout(
                     title = "Title",
                     description = "Description",
                     id = "ID"
                 ),
-                onTaskClick = { },
+                onWorkoutClick = { },
                 onCheckedChange = { }
             )
         }
@@ -328,17 +328,17 @@ private fun TaskItemPreview() {
 
 @Preview
 @Composable
-private fun TaskItemCompletedPreview() {
+private fun WorkoutItemCompletedPreview() {
     AppCompatTheme {
         Surface {
-            TaskItem(
-                task = Task(
+            WorkoutItem(
+                workout = Workout(
                     title = "Title",
                     description = "Description",
                     isCompleted = true,
                     id = "ID"
                 ),
-                onTaskClick = { },
+                onWorkoutClick = { },
                 onCheckedChange = { }
             )
         }

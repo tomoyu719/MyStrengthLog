@@ -23,16 +23,16 @@ import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Main activity for the todoapp
+ * Main activity for the MyStrengthLogApp
  */
 @AndroidEntryPoint
-class TodoActivity : ComponentActivity() {
+class MyStrengthLogActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppCompatTheme {
-                TodoNavGraph()
+                MyStrengthLogNavGraph()
             }
         }
     }

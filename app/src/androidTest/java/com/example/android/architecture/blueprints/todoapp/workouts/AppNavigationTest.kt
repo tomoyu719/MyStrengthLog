@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.workouts
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.assertIsDisplayed
@@ -27,8 +27,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.MyStrengthLogNavGraph
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -50,7 +50,7 @@ class AppNavigationTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
-    // Executes tasks in the Architecture Components in the same thread
+    // Executes Tasks in the Architecture Components in the same thread
     @get:Rule(order = 1)
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -59,7 +59,7 @@ class AppNavigationTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var taskRepository: TaskRepository
+    lateinit var workoutRepository: WorkoutRepository
 
     @Before
     fun init() {
@@ -67,47 +67,47 @@ class AppNavigationTest {
     }
 
     @Test
-    fun bottomNavigationFromTasksToStatistics() {
+    fun bottomNavigationFromWorkoutsToStatistics() {
         setContent()
 
         // Start statistics screen.
         composeTestRule.onNodeWithText(activity.getString(R.string.statistics_title)).performClick()
 
         // Check that statistics screen was opened.
-        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_no_tasks))
+        composeTestRule.onNodeWithText(activity.getString(R.string.statistics_no_workouts))
             .assertIsDisplayed()
 
-        // Start tasks screen.
+        // Start workouts screen.
         composeTestRule.onNodeWithText(activity.getString(R.string.list_title)).performClick()
 
-        // Check that tasks screen was opened.
-        composeTestRule.onNodeWithText(activity.getString(R.string.no_tasks_all))
+        // Check that workouts screen was opened.
+        composeTestRule.onNodeWithText(activity.getString(R.string.no_workouts_all))
             .assertIsDisplayed()
     }
 
 
     @Test
-    fun taskDetailScreen_doubleUIBackButton() = runTest {
-        val taskName = "UI <- button"
-        taskRepository.createTask(taskName, "Description")
+    fun workoutDetailScreen_doubleUIBackButton() = runTest {
+        val workoutName = "UI <- button"
+        workoutRepository.createWorkout(workoutName, "Description")
 
         setContent()
 
-        // Click on the task on the list
+        // Click on the workout on the list
         composeTestRule.onNodeWithText(activity.getString(R.string.label_all)).assertIsDisplayed()
-        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
-        composeTestRule.onNodeWithText(taskName).performClick()
+        composeTestRule.onNodeWithText(workoutName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(workoutName).performClick()
 
-        // Click on the edit task button
-        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+        // Click on the edit workout button
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_workout))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_workout))
             .performClick()
 
-        // Confirm that if we click "<-" once, we end up back at the task details page
+        // Confirm that if we click "<-" once, we end up back at the workout details page
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.menu_back))
             .performClick()
-        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(workoutName).assertIsDisplayed()
 
         // Confirm that if we click "<-" a second time, we end up back at the home screen
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.menu_back))
@@ -116,22 +116,22 @@ class AppNavigationTest {
     }
 
     @Test
-    fun taskDetailScreen_doubleBackButton() = runTest {
-        val taskName = "Back button"
-        taskRepository.createTask(taskName, "Description")
+    fun workoutDetailScreen_doubleBackButton() = runTest {
+        val workoutName = "Back button"
+        workoutRepository.createWorkout(workoutName, "Description")
 
         setContent()
 
-        // Click on the task on the list
-        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
-        composeTestRule.onNodeWithText(taskName).performClick()
-        // Click on the edit task button
-        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_task))
+        // Click on the workout on the list
+        composeTestRule.onNodeWithText(workoutName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(workoutName).performClick()
+        // Click on the edit workout button
+        composeTestRule.onNodeWithContentDescription(activity.getString(R.string.edit_workout))
             .performClick()
 
-        // Confirm that if we click back once, we end up back at the task details page
+        // Confirm that if we click back once, we end up back at the workout details page
         pressBack()
-        composeTestRule.onNodeWithText(taskName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(workoutName).assertIsDisplayed()
 
         // Confirm that if we click back a second time, we end up back at the home screen
         pressBack()
@@ -141,7 +141,7 @@ class AppNavigationTest {
     private fun setContent() {
         composeTestRule.setContent {
             AppCompatTheme {
-                TodoNavGraph()
+                MyStrengthLogNavGraph()
             }
         }
     }

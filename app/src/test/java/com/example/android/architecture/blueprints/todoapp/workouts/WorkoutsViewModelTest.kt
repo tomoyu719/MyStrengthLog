@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.workouts
 
 import androidx.lifecycle.SavedStateHandle
 import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
@@ -22,8 +22,8 @@ import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.FakeTaskRepository
-import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.FakeWorkoutRepository
+import com.example.android.architecture.blueprints.todoapp.data.Workout
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,16 +37,16 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Unit tests for the implementation of [TasksViewModel]
+ * Unit tests for the implementation of [WorkoutsViewModel]
  */
 @ExperimentalCoroutinesApi
-class TasksViewModelTest {
+class WorkoutsViewModelTest {
 
     // Subject under test
-    private lateinit var tasksViewModel: TasksViewModel
+    private lateinit var workoutsViewModel: WorkoutsViewModel
 
     // Use a fake repository to be injected into the viewmodel
-    private lateinit var tasksRepository: FakeTaskRepository
+    private lateinit var workoutsRepository: FakeWorkoutRepository
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -55,174 +55,174 @@ class TasksViewModelTest {
 
     @Before
     fun setupViewModel() {
-        // We initialise the tasks to 3, with one active and two completed
-        tasksRepository = FakeTaskRepository()
-        val task1 = Task(id = "1", title = "Title1", description = "Desc1")
-        val task2 = Task(id = "2", title = "Title2", description = "Desc2", isCompleted = true)
-        val task3 = Task(id = "3", title = "Title3", description = "Desc3", isCompleted = true)
-        tasksRepository.addTasks(task1, task2, task3)
+        // We initialise the workouts to 3, with one active and two completed
+        workoutsRepository = FakeWorkoutRepository()
+        val workout1 = Workout(id = "1", title = "Title1", description = "Desc1")
+        val workout2 = Workout(id = "2", title = "Title2", description = "Desc2", isCompleted = true)
+        val workout3 = Workout(id = "3", title = "Title3", description = "Desc3", isCompleted = true)
+        workoutsRepository.addWorkouts(workout1, workout2, workout3)
 
-        tasksViewModel = TasksViewModel(tasksRepository, SavedStateHandle())
+        workoutsViewModel = WorkoutsViewModel(workoutsRepository, SavedStateHandle())
     }
 
     @Test
-    fun loadAllTasksFromRepository_loadingTogglesAndDataLoaded() = runTest {
+    fun loadAllWorkoutsFromRepository_loadingTogglesAndDataLoaded() = runTest {
         // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
 
-        // Given an initialized TasksViewModel with initialized tasks
-        // When loading of Tasks is requested
-        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
+        // Given an initialized WorkoutsViewModel with initialized workouts
+        // When loading of Workouts is requested
+        workoutsViewModel.setFiltering(WorkoutsFilterType.ALL_WORKOUTS)
 
-        // Trigger loading of tasks
-        tasksViewModel.refresh()
+        // Trigger loading of workouts
+        workoutsViewModel.refresh()
 
         // Then progress indicator is shown
-        assertThat(tasksViewModel.uiState.first().isLoading).isTrue()
+        assertThat(workoutsViewModel.uiState.first().isLoading).isTrue()
 
         // Execute pending coroutines actions
         advanceUntilIdle()
 
         // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+        assertThat(workoutsViewModel.uiState.first().isLoading).isFalse()
 
         // And data correctly loaded
-        assertThat(tasksViewModel.uiState.first().items).hasSize(3)
+        assertThat(workoutsViewModel.uiState.first().items).hasSize(3)
     }
 
     @Test
-    fun loadActiveTasksFromRepositoryAndLoadIntoView() = runTest {
-        // Given an initialized TasksViewModel with initialized tasks
-        // When loading of Tasks is requested
-        tasksViewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
+    fun loadActiveWorkoutsFromRepositoryAndLoadIntoView() = runTest {
+        // Given an initialized WorkoutsViewModel with initialized workouts
+        // When loading of Workouts is requested
+        workoutsViewModel.setFiltering(WorkoutsFilterType.ACTIVE_WORKOUTS)
 
-        // Load tasks
-        tasksViewModel.refresh()
+        // Load workouts
+        workoutsViewModel.refresh()
 
         // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+        assertThat(workoutsViewModel.uiState.first().isLoading).isFalse()
 
         // And data correctly loaded
-        assertThat(tasksViewModel.uiState.first().items).hasSize(1)
+        assertThat(workoutsViewModel.uiState.first().items).hasSize(1)
     }
 
     @Test
-    fun loadCompletedTasksFromRepositoryAndLoadIntoView() = runTest {
-        // Given an initialized TasksViewModel with initialized tasks
-        // When loading of Tasks is requested
-        tasksViewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
+    fun loadCompletedWorkoutsFromRepositoryAndLoadIntoView() = runTest {
+        // Given an initialized WorkoutsViewModel with initialized workouts
+        // When loading of Workouts is requested
+        workoutsViewModel.setFiltering(WorkoutsFilterType.COMPLETED_WORKOUTS)
 
-        // Load tasks
-        tasksViewModel.refresh()
+        // Load workouts
+        workoutsViewModel.refresh()
 
         // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+        assertThat(workoutsViewModel.uiState.first().isLoading).isFalse()
 
         // And data correctly loaded
-        assertThat(tasksViewModel.uiState.first().items).hasSize(2)
+        assertThat(workoutsViewModel.uiState.first().items).hasSize(2)
     }
 
     @Test
-    fun loadTasks_error() = runTest {
+    fun loadWorkouts_error() = runTest {
         // Make the repository throw errors
-        tasksRepository.setShouldThrowError(true)
+        workoutsRepository.setShouldThrowError(true)
 
-        // Load tasks
-        tasksViewModel.refresh()
+        // Load workouts
+        workoutsViewModel.refresh()
 
         // Then progress indicator is hidden
-        assertThat(tasksViewModel.uiState.first().isLoading).isFalse()
+        assertThat(workoutsViewModel.uiState.first().isLoading).isFalse()
 
         // And the list of items is empty
-        assertThat(tasksViewModel.uiState.first().items).isEmpty()
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.loading_tasks_error)
+        assertThat(workoutsViewModel.uiState.first().items).isEmpty()
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.loading_workouts_error)
     }
 
     @Test
-    fun clearCompletedTasks_clearsTasks() = runTest {
-        // When completed tasks are cleared
-        tasksViewModel.clearCompletedTasks()
+    fun clearCompletedWorkouts_clearsWorkouts() = runTest {
+        // When completed workouts are cleared
+        workoutsViewModel.clearCompletedWorkouts()
 
-        // Fetch tasks
-        tasksViewModel.refresh()
+        // Fetch workouts
+        workoutsViewModel.refresh()
 
-        // Fetch tasks
-        val allTasks = tasksViewModel.uiState.first().items
-        val completedTasks = allTasks?.filter { it.isCompleted }
+        // Fetch workouts
+        val allWorkouts = workoutsViewModel.uiState.first().items
+        val completedWorkouts = allWorkouts?.filter { it.isCompleted }
 
-        // Verify there are no completed tasks left
-        assertThat(completedTasks).isEmpty()
+        // Verify there are no completed workouts left
+        assertThat(completedWorkouts).isEmpty()
 
-        // Verify active task is not cleared
-        assertThat(allTasks).hasSize(1)
+        // Verify active workout is not cleared
+        assertThat(allWorkouts).hasSize(1)
 
         // Verify snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.completed_tasks_cleared)
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.completed_workouts_cleared)
     }
 
     @Test
     fun showEditResultMessages_editOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(EDIT_RESULT_OK)
+        workoutsViewModel.showEditResultMessage(EDIT_RESULT_OK)
 
         // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_saved_task_message)
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.successfully_saved_workout_message)
     }
 
     @Test
     fun showEditResultMessages_addOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
+        workoutsViewModel.showEditResultMessage(ADD_EDIT_RESULT_OK)
 
         // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_added_task_message)
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.successfully_added_workout_message)
     }
 
     @Test
     fun showEditResultMessages_deleteOk_snackbarUpdated() = runTest {
         // When the viewmodel receives a result from another destination
-        tasksViewModel.showEditResultMessage(DELETE_RESULT_OK)
+        workoutsViewModel.showEditResultMessage(DELETE_RESULT_OK)
 
         // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.successfully_deleted_task_message)
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.successfully_deleted_workout_message)
     }
 
     @Test
-    fun completeTask_dataAndSnackbarUpdated() = runTest {
-        // With a repository that has an active task
-        val task = Task(id = "id", title = "Title", description = "Description")
-        tasksRepository.addTasks(task)
+    fun completeWorkout_dataAndSnackbarUpdated() = runTest {
+        // With a repository that has an active workout
+        val workout = Workout(id = "id", title = "Title", description = "Description")
+        workoutsRepository.addWorkouts(workout)
 
-        // Complete task
-        tasksViewModel.completeTask(task, true)
+        // Complete workout
+        workoutsViewModel.completeWorkout(workout, true)
 
-        // Verify the task is completed
-        assertThat(tasksRepository.savedTasks.value[task.id]?.isCompleted).isTrue()
+        // Verify the workout is completed
+        assertThat(workoutsRepository.savedWorkouts.value[workout.id]?.isCompleted).isTrue()
 
         // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.task_marked_complete)
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.workout_marked_complete)
     }
 
     @Test
-    fun activateTask_dataAndSnackbarUpdated() = runTest {
-        // With a repository that has a completed task
-        val task = Task(id = "id", title = "Title", description = "Description", isCompleted = true)
-        tasksRepository.addTasks(task)
+    fun activateWorkout_dataAndSnackbarUpdated() = runTest {
+        // With a repository that has a completed workout
+        val workout = Workout(id = "id", title = "Title", description = "Description", isCompleted = true)
+        workoutsRepository.addWorkouts(workout)
 
-        // Activate task
-        tasksViewModel.completeTask(task, false)
+        // Activate workout
+        workoutsViewModel.completeWorkout(workout, false)
 
-        // Verify the task is active
-        assertThat(tasksRepository.savedTasks.value[task.id]?.isActive).isTrue()
+        // Verify the workout is active
+        assertThat(workoutsRepository.savedWorkouts.value[workout.id]?.isActive).isTrue()
 
         // The snackbar is updated
-        assertThat(tasksViewModel.uiState.first().userMessage)
-            .isEqualTo(R.string.task_marked_active)
+        assertThat(workoutsViewModel.uiState.first().userMessage)
+            .isEqualTo(R.string.workout_marked_active)
     }
 }

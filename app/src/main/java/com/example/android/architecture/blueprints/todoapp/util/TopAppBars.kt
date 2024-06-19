@@ -31,7 +31,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,28 +46,28 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @Composable
-fun TasksTopAppBar(
-    onFilterAllTasks: () -> Unit,
-    onFilterActiveTasks: () -> Unit,
-    onFilterCompletedTasks: () -> Unit,
-    onClearCompletedTasks: () -> Unit,
-    onRefresh: () -> Unit
+fun WorkoutsTopAppBar(
+        onFilterAllWorkouts: () -> Unit,
+        onFilterActiveWorkouts: () -> Unit,
+        onFilterCompletedWorkouts: () -> Unit,
+        onClearCompletedWorkouts: () -> Unit,
+        onRefresh: () -> Unit
 ) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
-            FilterTasksMenu(onFilterAllTasks, onFilterActiveTasks, onFilterCompletedTasks)
-            MoreTasksMenu(onClearCompletedTasks, onRefresh)
+            FilterWorkoutsMenu(onFilterAllWorkouts, onFilterActiveWorkouts, onFilterCompletedWorkouts)
+            MoreWorkoutsMenu(onClearCompletedWorkouts, onRefresh)
         },
         modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
-private fun FilterTasksMenu(
-    onFilterAllTasks: () -> Unit,
-    onFilterActiveTasks: () -> Unit,
-    onFilterCompletedTasks: () -> Unit
+private fun FilterWorkoutsMenu(
+        onFilterAllWorkouts: () -> Unit,
+        onFilterActiveWorkouts: () -> Unit,
+        onFilterCompletedWorkouts: () -> Unit
 ) {
     TopAppBarDropdownMenu(
         iconContent = {
@@ -78,29 +77,29 @@ private fun FilterTasksMenu(
             )
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onFilterAllTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = { onFilterAllWorkouts(); closeMenu() }) {
             Text(text = stringResource(id = R.string.nav_all))
         }
-        DropdownMenuItem(onClick = { onFilterActiveTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = { onFilterActiveWorkouts(); closeMenu() }) {
             Text(text = stringResource(id = R.string.nav_active))
         }
-        DropdownMenuItem(onClick = { onFilterCompletedTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = { onFilterCompletedWorkouts(); closeMenu() }) {
             Text(text = stringResource(id = R.string.nav_completed))
         }
     }
 }
 
 @Composable
-private fun MoreTasksMenu(
-    onClearCompletedTasks: () -> Unit,
-    onRefresh: () -> Unit
+private fun MoreWorkoutsMenu(
+        onClearCompletedWorkouts: () -> Unit,
+        onRefresh: () -> Unit
 ) {
     TopAppBarDropdownMenu(
         iconContent = {
             Icon(Icons.Filled.MoreVert, stringResource(id = R.string.menu_more))
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onClearCompletedTasks(); closeMenu() }) {
+        DropdownMenuItem(onClick = { onClearCompletedWorkouts(); closeMenu() }) {
             Text(text = stringResource(id = R.string.menu_clear))
         }
         DropdownMenuItem(onClick = { onRefresh(); closeMenu() }) {
@@ -140,10 +139,10 @@ fun StatisticsTopAppBar() {
 }
 
 @Composable
-fun TaskDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
+fun WorkoutDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
     TopAppBar(
         title = {
-            Text(text = stringResource(id = R.string.task_details))
+            Text(text = stringResource(id = R.string.workout_details))
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
@@ -152,7 +151,7 @@ fun TaskDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
         },
         actions = {
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, stringResource(id = R.string.menu_delete_task))
+                Icon(Icons.Filled.Delete, stringResource(id = R.string.menu_delete_workout))
             }
         },
         modifier = Modifier.fillMaxWidth()
@@ -160,7 +159,7 @@ fun TaskDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
 }
 
 @Composable
-fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
+fun AddEditWorkoutTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(title)) },
         navigationIcon = {
@@ -174,10 +173,10 @@ fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
 
 @Preview
 @Composable
-private fun TasksTopAppBarPreview() {
+private fun WorkoutsTopAppBarPreview() {
     AppCompatTheme {
         Surface {
-            TasksTopAppBar({}, {}, {}, {}, {})
+            WorkoutsTopAppBar({}, {}, {}, {}, {})
         }
     }
 }
@@ -194,20 +193,20 @@ private fun StatisticsTopAppBarPreview() {
 
 @Preview
 @Composable
-private fun TaskDetailTopAppBarPreview() {
+private fun WorkoutDetailTopAppBarPreview() {
     AppCompatTheme {
         Surface {
-            TaskDetailTopAppBar({ }, { })
+            WorkoutDetailTopAppBar({ }, { })
         }
     }
 }
 
 @Preview
 @Composable
-private fun AddEditTaskTopAppBarPreview() {
+private fun AddEditWorkoutTopAppBarPreview() {
     AppCompatTheme {
         Surface {
-            AddEditTaskTopAppBar(R.string.add_task) { }
+            AddEditWorkoutTopAppBar(R.string.add_workout) { }
         }
     }
 }

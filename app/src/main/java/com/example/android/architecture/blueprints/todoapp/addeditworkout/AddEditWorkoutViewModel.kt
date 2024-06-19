@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.addedittask
+package com.example.android.architecture.blueprints.todoapp.addeditworkout
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,51 +33,51 @@ import kotlinx.coroutines.launch
 /**
  * UiState for the Add/Edit screen
  */
-data class AddEditTaskUiState(
-    val title: String = "",
-    val description: String = "",
-    val isTaskCompleted: Boolean = false,
-    val isLoading: Boolean = false,
-    val userMessage: Int? = null,
-    val isTaskSaved: Boolean = false
+data class AddEditWorkoutUiState(
+        val title: String = "",
+        val description: String = "",
+        val isWorkoutCompleted: Boolean = false,
+        val isLoading: Boolean = false,
+        val userMessage: Int? = null,
+        val isWorkoutSaved: Boolean = false
 )
 
 /**
  * ViewModel for the Add/Edit screen.
  */
 @HiltViewModel
-class AddEditTaskViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
-    savedStateHandle: SavedStateHandle
+class AddEditWorkoutViewModel @Inject constructor(
+        private val workoutRepository: WorkoutRepository,
+        savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val taskId: String? = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]
+    private val workoutId: String? = savedStateHandle[WorkoutDestinationsArgs.WORKOUT_ID_ARG]
 
     // A MutableStateFlow needs to be created in this ViewModel. The source of truth of the current
-    // editable Task is the ViewModel, we need to mutate the UI state directly in methods such as
+    // editable Workout is the ViewModel, we need to mutate the UI state directly in methods such as
     // `updateTitle` or `updateDescription`
-    private val _uiState = MutableStateFlow(AddEditTaskUiState())
-    val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(AddEditWorkoutUiState())
+    val uiState: StateFlow<AddEditWorkoutUiState> = _uiState.asStateFlow()
 
     init {
-        if (taskId != null) {
-            loadTask(taskId)
+        if (workoutId != null) {
+            loadWorkout(workoutId)
         }
     }
 
     // Called when clicking on fab.
-    fun saveTask() {
+    fun saveWorkout() {
         if (uiState.value.title.isEmpty() || uiState.value.description.isEmpty()) {
             _uiState.update {
-                it.copy(userMessage = R.string.empty_task_message)
+                it.copy(userMessage = R.string.empty_workout_message)
             }
             return
         }
 
-        if (taskId == null) {
-            createNewTask()
+        if (workoutId == null) {
+            createNewWorkout()
         } else {
-            updateTask()
+            updateWorkout()
         }
     }
 
@@ -99,41 +99,41 @@ class AddEditTaskViewModel @Inject constructor(
         }
     }
 
-    private fun createNewTask() = viewModelScope.launch {
-        taskRepository.createTask(uiState.value.title, uiState.value.description)
+    private fun createNewWorkout() = viewModelScope.launch {
+        workoutRepository.createWorkout(uiState.value.title, uiState.value.description)
         _uiState.update {
-            it.copy(isTaskSaved = true)
+            it.copy(isWorkoutSaved = true)
         }
     }
 
-    private fun updateTask() {
-        if (taskId == null) {
-            throw RuntimeException("updateTask() was called but task is new.")
+    private fun updateWorkout() {
+        if (workoutId == null) {
+            throw RuntimeException("updateWorkout() was called but workout is new.")
         }
         viewModelScope.launch {
-            taskRepository.updateTask(
-                taskId,
+            workoutRepository.updateWorkout(
+                workoutId,
                 title = uiState.value.title,
                 description = uiState.value.description,
             )
             _uiState.update {
-                it.copy(isTaskSaved = true)
+                it.copy(isWorkoutSaved = true)
             }
         }
     }
 
-    private fun loadTask(taskId: String) {
+    private fun loadWorkout(workoutId: String) {
         _uiState.update {
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            taskRepository.getTask(taskId).let { task ->
-                if (task != null) {
+            workoutRepository.getWorkout(workoutId).let { workout ->
+                if (workout != null) {
                     _uiState.update {
                         it.copy(
-                            title = task.title,
-                            description = task.description,
-                            isTaskCompleted = task.isCompleted,
+                            title = workout.title,
+                            description = workout.description,
+                            isWorkoutCompleted = workout.isCompleted,
                             isLoading = false
                         )
                     }

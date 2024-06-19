@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.taskdetail
+package com.example.android.architecture.blueprints.todoapp.workoutdetail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,41 +45,41 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.Workout
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
-import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopAppBar
+import com.example.android.architecture.blueprints.todoapp.util.WorkoutDetailTopAppBar
 import com.google.accompanist.appcompattheme.AppCompatTheme
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun TaskDetailScreen(
-    onEditTask: (String) -> Unit,
-    onBack: () -> Unit,
-    onDeleteTask: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: TaskDetailViewModel = hiltViewModel(),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+fun WorkoutDetailScreen(
+        onEditWorkout: (String) -> Unit,
+        onBack: () -> Unit,
+        onDeleteWorkout: () -> Unit,
+        modifier: Modifier = Modifier,
+        viewModel: WorkoutDetailViewModel = hiltViewModel(),
+        scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
     Scaffold(
         scaffoldState = scaffoldState,
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TaskDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteTask)
+            WorkoutDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteWorkout)
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
-                Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_task))
+            FloatingActionButton(onClick = { onEditWorkout(viewModel.workoutId) }) {
+                Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_workout))
             }
         }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        EditTaskContent(
+        EditWorkoutContent(
             loading = uiState.isLoading,
-            empty = uiState.task == null && !uiState.isLoading,
-            task = uiState.task,
+            empty = uiState.workout == null && !uiState.isLoading,
+            workout = uiState.workout,
             onRefresh = viewModel::refresh,
-            onTaskCheck = viewModel::setCompleted,
+            onWorkoutCheck = viewModel::setCompleted,
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -92,23 +92,23 @@ fun TaskDetailScreen(
             }
         }
 
-        // Check if the task is deleted and call onDeleteTask
-        LaunchedEffect(uiState.isTaskDeleted) {
-            if (uiState.isTaskDeleted) {
-                onDeleteTask()
+        // Check if the workout is deleted and call onDeleteWorkout
+        LaunchedEffect(uiState.isWorkoutDeleted) {
+            if (uiState.isWorkoutDeleted) {
+                onDeleteWorkout()
             }
         }
     }
 }
 
 @Composable
-private fun EditTaskContent(
-    loading: Boolean,
-    empty: Boolean,
-    task: Task?,
-    onTaskCheck: (Boolean) -> Unit,
-    onRefresh: () -> Unit,
-    modifier: Modifier = Modifier
+private fun EditWorkoutContent(
+        loading: Boolean,
+        empty: Boolean,
+        workout: Workout?,
+        onWorkoutCheck: (Boolean) -> Unit,
+        onRefresh: () -> Unit,
+        modifier: Modifier = Modifier
 ) {
     val screenPadding = Modifier.padding(
         horizontal = dimensionResource(id = R.dimen.horizontal_margin),
@@ -136,11 +136,11 @@ private fun EditTaskContent(
                     .then(screenPadding),
 
             ) {
-                if (task != null) {
-                    Checkbox(task.isCompleted, onTaskCheck)
+                if (workout != null) {
+                    Checkbox(workout.isCompleted, onWorkoutCheck)
                     Column {
-                        Text(text = task.title, style = MaterialTheme.typography.h6)
-                        Text(text = task.description, style = MaterialTheme.typography.body1)
+                        Text(text = workout.title, style = MaterialTheme.typography.h6)
+                        Text(text = workout.description, style = MaterialTheme.typography.body1)
                     }
                 }
             }
@@ -150,19 +150,19 @@ private fun EditTaskContent(
 
 @Preview
 @Composable
-private fun EditTaskContentPreview() {
+private fun EditWorkoutContentPreview() {
     AppCompatTheme {
         Surface {
-            EditTaskContent(
+            EditWorkoutContent(
                 loading = false,
                 empty = false,
-                Task(
+                Workout(
                     title = "Title",
                     description = "Description",
                     isCompleted = false,
                     id = "ID"
                 ),
-                onTaskCheck = { },
+                onWorkoutCheck = { },
                 onRefresh = { }
             )
         }
@@ -171,19 +171,19 @@ private fun EditTaskContentPreview() {
 
 @Preview
 @Composable
-private fun EditTaskContentTaskCompletedPreview() {
+private fun EditWorkoutContentWorkoutCompletedPreview() {
     AppCompatTheme {
         Surface {
-            EditTaskContent(
+            EditWorkoutContent(
                 loading = false,
                 empty = false,
-                Task(
+                Workout(
                     title = "Title",
                     description = "Description",
                     isCompleted = false,
                     id = "ID"
                 ),
-                onTaskCheck = { },
+                onWorkoutCheck = { },
                 onRefresh = { }
             )
         }
@@ -192,19 +192,19 @@ private fun EditTaskContentTaskCompletedPreview() {
 
 @Preview
 @Composable
-private fun EditTaskContentEmptyPreview() {
+private fun EditWorkoutContentEmptyPreview() {
     AppCompatTheme {
         Surface {
-            EditTaskContent(
+            EditWorkoutContent(
                 loading = false,
                 empty = true,
-                Task(
+                Workout(
                     title = "Title",
                     description = "Description",
                     isCompleted = false,
                     id = "ID"
                 ),
-                onTaskCheck = { },
+                onWorkoutCheck = { },
                 onRefresh = { }
             )
         }

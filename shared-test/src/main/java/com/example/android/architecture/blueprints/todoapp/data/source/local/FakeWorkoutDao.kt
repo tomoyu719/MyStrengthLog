@@ -18,42 +18,42 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import kotlinx.coroutines.flow.Flow
 
-class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
+class FakeWorkoutDao(initialWorkouts: List<LocalWorkout>? = emptyList()) : WorkoutDao {
 
-    private var _tasks: MutableMap<String, LocalTask>? = null
+    private var _workouts: MutableMap<String, LocalWorkout>? = null
 
-    var tasks: List<LocalTask>?
-        get() = _tasks?.values?.toList()
-        set(newTasks) {
-            _tasks = newTasks?.associateBy { it.id }?.toMutableMap()
+    var workouts: List<LocalWorkout>?
+        get() = _workouts?.values?.toList()
+        set(newWorkouts) {
+            _workouts = newWorkouts?.associateBy { it.id }?.toMutableMap()
         }
 
     init {
-        tasks = initialTasks
+        workouts = initialWorkouts
     }
 
-    override suspend fun getAll() = tasks ?: throw Exception("Task list is null")
+    override suspend fun getAll() = workouts ?: throw Exception("Workout list is null")
 
-    override suspend fun getById(taskId: String): LocalTask? = _tasks?.get(taskId)
+    override suspend fun getById(workoutId: String): LocalWorkout? = _workouts?.get(workoutId)
 
-    override suspend fun upsertAll(tasks: List<LocalTask>) {
-        _tasks?.putAll(tasks.associateBy { it.id })
+    override suspend fun upsertAll(workouts: List<LocalWorkout>) {
+        _workouts?.putAll(workouts.associateBy { it.id })
     }
 
-    override suspend fun upsert(task: LocalTask) {
-        _tasks?.put(task.id, task)
+    override suspend fun upsert(workout: LocalWorkout) {
+        _workouts?.put(workout.id, workout)
     }
 
-    override suspend fun updateCompleted(taskId: String, completed: Boolean) {
-        _tasks?.get(taskId)?.let { it.isCompleted = completed }
+    override suspend fun updateCompleted(workoutId: String, completed: Boolean) {
+        _workouts?.get(workoutId)?.let { it.isCompleted = completed }
     }
 
     override suspend fun deleteAll() {
-        _tasks?.clear()
+        _workouts?.clear()
     }
 
-    override suspend fun deleteById(taskId: String): Int {
-        return if (_tasks?.remove(taskId) == null) {
+    override suspend fun deleteById(workoutId: String): Int {
+        return if (_workouts?.remove(workoutId) == null) {
             0
         } else {
             1
@@ -61,7 +61,7 @@ class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
     }
 
     override suspend fun deleteCompleted(): Int {
-        _tasks?.apply {
+        _workouts?.apply {
             val originalSize = size
             entries.removeIf { it.value.isCompleted }
             return originalSize - size
@@ -69,11 +69,11 @@ class FakeTaskDao(initialTasks: List<LocalTask>? = emptyList()) : TaskDao {
         return 0
     }
 
-    override fun observeAll(): Flow<List<LocalTask>> {
+    override fun observeAll(): Flow<List<LocalWorkout>> {
         TODO("Not implemented")
     }
 
-    override fun observeById(taskId: String): Flow<LocalTask> {
+    override fun observeById(workoutId: String): Flow<LocalWorkout> {
         TODO("Not implemented")
     }
 }

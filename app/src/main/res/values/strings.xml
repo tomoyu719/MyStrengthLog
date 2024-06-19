@@ -15,38 +15,38 @@
      limitations under the License.
 -->
 <resources>
-    <string name="app_name">Todo</string>
-    <string name="add_task">New Task</string>
-    <string name="edit_task">Edit Task</string>
-    <string name="task_details">Task Details</string>
-    <string name="task_marked_complete">Task marked complete</string>
-    <string name="task_marked_active">Task marked active</string>
-    <string name="loading_tasks_error">Error while loading tasks</string>
-    <string name="loading_task_error">Error while loading task</string>
-    <string name="task_not_found">Task not found</string>
-    <string name="completed_tasks_cleared">Completed tasks cleared</string>
+    <string name="app_name">MyStrengthLog</string>
+    <string name="add_workout">New Workout</string>
+    <string name="edit_workout">Edit Workout</string>
+    <string name="workout_details">Workout Details</string>
+    <string name="workout_marked_complete">Workout marked complete</string>
+    <string name="workout_marked_active">Workout marked active</string>
+    <string name="loading_workouts_error">Error while loading workout</string>
+    <string name="loading_workout_error">Error while loading workout</string>
+    <string name="workout_not_found">Workout not found</string>
+    <string name="completed_workouts_cleared">Completed workouts cleared</string>
     <string name="menu_filter">Filter</string>
     <string name="open_drawer">Open Drawer</string>
     <string name="menu_back">Back</string>
     <string name="menu_clear">Clear completed</string>
-    <string name="menu_delete_task">Delete task</string>
+    <string name="menu_delete_workout">Delete workout</string>
     <string name="menu_more">More</string>
-    <string name="navigation_view_header_title">Todo</string>
+    <string name="navigation_view_header_title">MyStrengthLog</string>
     <string name="title_hint">Title</string>
-    <string name="description_hint">Enter your task here.</string>
-    <string name="cd_save_task">Save task</string>
-    <string name="empty_task_message">Tasks cannot be empty</string>
-    <string name="successfully_saved_task_message">Task saved</string>
-    <string name="list_title">Task List</string>
+    <string name="description_hint">Enter your workout here.</string>
+    <string name="cd_save_workout">Save workout</string>
+    <string name="empty_workout_message">Workouts cannot be empty</string>
+    <string name="successfully_saved_workout_message">Workout saved</string>
+    <string name="list_title">Workout List</string>
     <string name="statistics_title">Statistics</string>
-    <string name="statistics_no_tasks">You have no tasks.</string>
-    <string name="statistics_active_tasks">Active tasks: %.1f%%</string>
-    <string name="statistics_completed_tasks">Completed tasks: %.1f%%</string>
+    <string name="statistics_no_workouts">You have no workouts.</string>
+    <string name="statistics_active_workouts">Active workouts: %.1f%%</string>
+    <string name="statistics_completed_workouts">Completed workouts: %.1f%%</string>
     <string name="statistics_error">Error loading statistics.</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
 
-    <string-array name="list_tasks_array">
+    <string-array name="list_workouts_array">
         <item>@string/nav_all</item>
         <item>@string/nav_active</item>
         <item>@string/nav_completed</item>
@@ -54,19 +54,19 @@
     <string name="nav_all">All</string>
     <string name="nav_active">Active</string>
     <string name="nav_completed">Completed</string>
-    <string name="label_all">All Tasks</string>
-    <string name="label_active">Active Tasks</string>
-    <string name="label_completed">Completed Tasks</string>
-    <string name="no_tasks_all">You have no tasks!</string>
-    <string name="no_tasks_active">You have no active tasks!</string>
-    <string name="no_tasks_completed">You have no completed tasks!</string>
+    <string name="label_all">All Workouts</string>
+    <string name="label_active">Active Workouts</string>
+    <string name="label_completed">Completed Workouts</string>
+    <string name="no_workouts_all">You have no workouts!</string>
+    <string name="no_workouts_active">You have no active workouts!</string>
+    <string name="no_workouts_completed">You have no completed workouts!</string>
     <string name="refresh">Refresh</string>
-    <string name="successfully_deleted_task_message">Task was deleted</string>
-    <string name="successfully_added_task_message">Task added</string>
+    <string name="successfully_deleted_workout_message">Workout was deleted</string>
+    <string name="successfully_added_workout_message">Workout added</string>
     <string name="no_data_description" />
 
     <!-- Content Descriptions -->
-    <string name="tasks_header_image_content_description">Tasks header image</string>
-    <string name="no_tasks_image_content_description">No tasks image</string>
+    <string name="workouts_header_image_content_description">Workouts header image</string>
+    <string name="no_workouts_image_content_description">No workouts image</string>
 
 </resources>

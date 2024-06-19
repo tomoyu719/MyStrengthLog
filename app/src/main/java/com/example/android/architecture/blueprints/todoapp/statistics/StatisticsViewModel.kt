@@ -19,8 +19,8 @@ package com.example.android.architecture.blueprints.todoapp.statistics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.data.Workout
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,10 +35,10 @@ import kotlinx.coroutines.launch
  * UiState for the statistics screen.
  */
 data class StatisticsUiState(
-    val isEmpty: Boolean = false,
-    val isLoading: Boolean = false,
-    val activeTasksPercent: Float = 0f,
-    val completedTasksPercent: Float = 0f
+        val isEmpty: Boolean = false,
+        val isLoading: Boolean = false,
+        val activeWorkoutsPercent: Float = 0f,
+        val completedWorkoutsPercent: Float = 0f
 )
 
 /**
@@ -46,14 +46,14 @@ data class StatisticsUiState(
  */
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<StatisticsUiState> =
-        taskRepository.getTasksStream()
+        workoutRepository.getWorkoutsStream()
             .map { Async.Success(it) }
-            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
-            .map { taskAsync -> produceStatisticsUiState(taskAsync) }
+            .catch<Async<List<Workout>>> { emit(Async.Error(R.string.loading_workouts_error)) }
+            .map { workoutAsync -> produceStatisticsUiState(workoutAsync) }
             .stateIn(
                 scope = viewModelScope,
                 started = WhileUiSubscribed,
@@ -62,12 +62,12 @@ class StatisticsViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            taskRepository.refresh()
+            workoutRepository.refresh()
         }
     }
 
-    private fun produceStatisticsUiState(taskLoad: Async<List<Task>>) =
-        when (taskLoad) {
+    private fun produceStatisticsUiState(workoutLoad: Async<List<Workout>>) =
+        when (workoutLoad) {
             Async.Loading -> {
                 StatisticsUiState(isLoading = true, isEmpty = true)
             }
@@ -76,11 +76,11 @@ class StatisticsViewModel @Inject constructor(
                 StatisticsUiState(isEmpty = true, isLoading = false)
             }
             is Async.Success -> {
-                val stats = getActiveAndCompletedStats(taskLoad.data)
+                val stats = getActiveAndCompletedStats(workoutLoad.data)
                 StatisticsUiState(
-                    isEmpty = taskLoad.data.isEmpty(),
-                    activeTasksPercent = stats.activeTasksPercent,
-                    completedTasksPercent = stats.completedTasksPercent,
+                    isEmpty = workoutLoad.data.isEmpty(),
+                    activeWorkoutsPercent = stats.activeWorkoutsPercent,
+                    completedWorkoutsPercent = stats.completedWorkoutsPercent,
                     isLoading = false
                 )
             }

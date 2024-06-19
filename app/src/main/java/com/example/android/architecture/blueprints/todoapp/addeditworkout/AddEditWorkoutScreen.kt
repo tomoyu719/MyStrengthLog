@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.addedittask
+package com.example.android.architecture.blueprints.todoapp.addeditworkout
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
@@ -49,33 +49,33 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
+import com.example.android.architecture.blueprints.todoapp.util.AddEditWorkoutTopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun AddEditTaskScreen(
-    @StringRes topBarTitle: Int,
-    onTaskUpdate: () -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    viewModel: AddEditTaskViewModel = hiltViewModel()
+fun AddEditWorkoutScreen(
+        @StringRes topBarTitle: Int,
+        onWorkoutUpdate: () -> Unit,
+        onBack: () -> Unit,
+        modifier: Modifier = Modifier,
+        scaffoldState: ScaffoldState = rememberScaffoldState(),
+        viewModel: AddEditWorkoutViewModel = hiltViewModel()
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
-        topBar = { AddEditTaskTopAppBar(topBarTitle, onBack) },
+        topBar = { AddEditWorkoutTopAppBar(topBarTitle, onBack) },
         floatingActionButton = {
-            FloatingActionButton(onClick = viewModel::saveTask) {
-                Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
+            FloatingActionButton(onClick = viewModel::saveWorkout) {
+                Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_workout))
             }
         }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        AddEditTaskContent(
+        AddEditWorkoutContent(
             loading = uiState.isLoading,
             title = uiState.title,
             description = uiState.description,
@@ -84,10 +84,10 @@ fun AddEditTaskScreen(
             modifier = Modifier.padding(paddingValues)
         )
 
-        // Check if the task is saved and call onTaskUpdate event
-        LaunchedEffect(uiState.isTaskSaved) {
-            if (uiState.isTaskSaved) {
-                onTaskUpdate()
+        // Check if the workout is saved and call onWorkoutUpdate event
+        LaunchedEffect(uiState.isWorkoutSaved) {
+            if (uiState.isWorkoutSaved) {
+                onWorkoutUpdate()
             }
         }
 
@@ -103,7 +103,7 @@ fun AddEditTaskScreen(
 }
 
 @Composable
-private fun AddEditTaskContent(
+private fun AddEditWorkoutContent(
     loading: Boolean,
     title: String,
     description: String,

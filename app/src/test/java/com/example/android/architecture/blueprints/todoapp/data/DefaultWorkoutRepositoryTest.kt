@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTaskDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeWorkoutDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
@@ -31,37 +31,37 @@ import org.junit.Test
  * Unit tests for the implementation of the in-memory repository with cache.
  */
 @ExperimentalCoroutinesApi
-class DefaultTaskRepositoryTest {
+class DefaultWorkoutRepositoryTest {
 
-    private val task1 = Task(id = "1", title = "Title1", description = "Description1")
-    private val task2 = Task(id = "2", title = "Title2", description = "Description2")
-    private val task3 = Task(id = "3", title = "Title3", description = "Description3")
+    private val workout1 = Workout(id = "1", title = "Title1", description = "Description1")
+    private val workout2 = Workout(id = "2", title = "Title2", description = "Description2")
+    private val workout3 = Workout(id = "3", title = "Title3", description = "Description3")
 
-    private val newTaskTitle = "Title new"
-    private val newTaskDescription = "Description new"
-    private val newTask = Task(id = "new", title = newTaskTitle, description = newTaskDescription)
-    private val newTasks = listOf(newTask)
+    private val newWorkoutTitle = "Title new"
+    private val newWorkoutDescription = "Description new"
+    private val newWorkout = Workout(id = "new", title = newWorkoutTitle, description = newWorkoutDescription)
+    private val newWorkouts = listOf(newWorkout)
 
-    private val networkTasks = listOf(task1, task2).toNetwork()
-    private val localTasks = listOf(task3.toLocal())
+    private val networkWorkouts = listOf(workout1, workout2).toNetwork()
+    private val localWorkouts = listOf(workout3.toLocal())
 
     // Test dependencies
     private lateinit var networkDataSource: FakeNetworkDataSource
-    private lateinit var localDataSource: FakeTaskDao
+    private lateinit var localDataSource: FakeWorkoutDao
 
     private var testDispatcher = UnconfinedTestDispatcher()
     private var testScope = TestScope(testDispatcher)
 
     // Class under test
-    private lateinit var taskRepository: DefaultTaskRepository
+    private lateinit var workoutRepository: DefaultWorkoutRepository
 
     @ExperimentalCoroutinesApi
     @Before
     fun createRepository() {
-        networkDataSource = FakeNetworkDataSource(networkTasks.toMutableList())
-        localDataSource = FakeTaskDao(localTasks)
+        networkDataSource = FakeNetworkDataSource(networkWorkouts.toMutableList())
+        localDataSource = FakeWorkoutDao(localWorkouts)
         // Get a reference to the class under test
-        taskRepository = DefaultTaskRepository(
+        workoutRepository = DefaultWorkoutRepository(
             networkDataSource = networkDataSource,
             localDataSource = localDataSource,
             dispatcher = testDispatcher,
@@ -71,215 +71,215 @@ class DefaultTaskRepositoryTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun getTasks_emptyRepositoryAndUninitializedCache() = testScope.runTest {
-        networkDataSource.tasks?.clear()
+    fun getWorkouts_emptyRepositoryAndUninitializedCache() = testScope.runTest {
+        networkDataSource.workouts?.clear()
         localDataSource.deleteAll()
 
-        assertThat(taskRepository.getTasks().size).isEqualTo(0)
+        assertThat(workoutRepository.getWorkouts().size).isEqualTo(0)
     }
 
     @Test
-    fun getTasks_repositoryCachesAfterFirstApiCall() = testScope.runTest {
-        // Trigger the repository to load tasks from the remote data source
-        val initial = taskRepository.getTasks(forceUpdate = true)
+    fun getWorkouts_repositoryCachesAfterFirstApiCall() = testScope.runTest {
+        // Trigger the repository to load workouts from the remote data source
+        val initial = workoutRepository.getWorkouts(forceUpdate = true)
 
         // Change the remote data source
-        networkDataSource.tasks = newTasks.toNetwork().toMutableList()
+        networkDataSource.workouts = newWorkouts.toNetwork().toMutableList()
 
-        // Load the tasks again without forcing a refresh
-        val second = taskRepository.getTasks()
+        // Load the workouts again without forcing a refresh
+        val second = workoutRepository.getWorkouts()
 
-        // Initial and second should match because we didn't force a refresh (no tasks were loaded
+        // Initial and second should match because we didn't force a refresh (no workouts were loaded
         // from the remote data source)
         assertThat(second).isEqualTo(initial)
     }
 
     @Test
-    fun getTasks_requestsAllTasksFromRemoteDataSource() = testScope.runTest {
-        // When tasks are requested from the tasks repository
-        val tasks = taskRepository.getTasks(true)
+    fun getWorkouts_requestsAllWorkoutsFromRemoteDataSource() = testScope.runTest {
+        // When workouts are requested from the workouts repository
+        val workouts = workoutRepository.getWorkouts(true)
 
-        // Then tasks are loaded from the remote data source
-        assertThat(tasks).isEqualTo(networkTasks.toExternal())
+        // Then workouts are loaded from the remote data source
+        assertThat(workouts).isEqualTo(networkWorkouts.toExternal())
     }
 
     @Test
-    fun saveTask_savesToLocalAndRemote() = testScope.runTest {
-        // When a task is saved to the tasks repository
-        val newTaskId = taskRepository.createTask(newTask.title, newTask.description)
+    fun saveWorkout_savesToLocalAndRemote() = testScope.runTest {
+        // When a workout is saved to the workouts repository
+        val newWorkoutId = workoutRepository.createWorkout(newWorkout.title, newWorkout.description)
 
-        // Then the remote and local sources contain the new task
-        assertThat(networkDataSource.tasks?.map { it.id }?.contains(newTaskId))
-        assertThat(localDataSource.tasks?.map { it.id }?.contains(newTaskId))
+        // Then the remote and local sources contain the new workout
+        assertThat(networkDataSource.workouts?.map { it.id }?.contains(newWorkoutId))
+        assertThat(localDataSource.workouts?.map { it.id }?.contains(newWorkoutId))
     }
 
     @Test
-    fun getTasks_WithDirtyCache_tasksAreRetrievedFromRemote() = testScope.runTest {
+    fun getWorkouts_WithDirtyCache_workoutsAreRetrievedFromRemote() = testScope.runTest {
         // First call returns from REMOTE
-        val tasks = taskRepository.getTasks()
+        val workouts = workoutRepository.getWorkouts()
 
-        // Set a different list of tasks in REMOTE
-        networkDataSource.tasks = newTasks.toNetwork().toMutableList()
+        // Set a different list of workouts in REMOTE
+        networkDataSource.workouts = newWorkouts.toNetwork().toMutableList()
 
-        // But if tasks are cached, subsequent calls load from cache
-        val cachedTasks = taskRepository.getTasks()
-        assertThat(cachedTasks).isEqualTo(tasks)
+        // But if workouts are cached, subsequent calls load from cache
+        val cachedWorkouts = workoutRepository.getWorkouts()
+        assertThat(cachedWorkouts).isEqualTo(workouts)
 
         // Now force remote loading
-        val refreshedTasks = taskRepository.getTasks(true)
+        val refreshedWorkouts = workoutRepository.getWorkouts(true)
 
-        // Tasks must be the recently updated in REMOTE
-        assertThat(refreshedTasks).isEqualTo(newTasks)
+        // Workouts must be the recently updated in REMOTE
+        assertThat(refreshedWorkouts).isEqualTo(newWorkouts)
     }
 
     @Test(expected = Exception::class)
-    fun getTasks_WithDirtyCache_remoteUnavailable_throwsException() = testScope.runTest {
+    fun getWorkouts_WithDirtyCache_remoteUnavailable_throwsException() = testScope.runTest {
         // Make remote data source unavailable
-        networkDataSource.tasks = null
+        networkDataSource.workouts = null
 
-        // Load tasks forcing remote load
-        taskRepository.getTasks(true)
+        // Load workouts forcing remote load
+        workoutRepository.getWorkouts(true)
 
         // Exception should be thrown
     }
 
     @Test
-    fun getTasks_WithRemoteDataSourceUnavailable_tasksAreRetrievedFromLocal() =
+    fun getWorkouts_WithRemoteDataSourceUnavailable_workoutsAreRetrievedFromLocal() =
         testScope.runTest {
             // When the remote data source is unavailable
-            networkDataSource.tasks = null
+            networkDataSource.workouts = null
 
             // The repository fetches from the local source
-            assertThat(taskRepository.getTasks()).isEqualTo(localTasks.toExternal())
+            assertThat(workoutRepository.getWorkouts()).isEqualTo(localWorkouts.toExternal())
         }
 
     @Test(expected = Exception::class)
-    fun getTasks_WithBothDataSourcesUnavailable_throwsError() = testScope.runTest {
+    fun getWorkouts_WithBothDataSourcesUnavailable_throwsError() = testScope.runTest {
         // When both sources are unavailable
-        networkDataSource.tasks = null
-        localDataSource.tasks = null
+        networkDataSource.workouts = null
+        localDataSource.workouts = null
 
         // The repository throws an error
-        taskRepository.getTasks()
+        workoutRepository.getWorkouts()
     }
 
     @Test
-    fun getTasks_refreshesLocalDataSource() = testScope.runTest {
-        // Forcing an update will fetch tasks from remote
-        val expectedTasks = networkTasks.toExternal()
+    fun getWorkouts_refreshesLocalDataSource() = testScope.runTest {
+        // Forcing an update will fetch workouts from remote
+        val expectedWorkouts = networkWorkouts.toExternal()
 
-        val newTasks = taskRepository.getTasks(true)
+        val newWorkouts = workoutRepository.getWorkouts(true)
 
-        assertEquals(expectedTasks, newTasks)
-        assertEquals(expectedTasks, localDataSource.tasks?.toExternal())
+        assertEquals(expectedWorkouts, newWorkouts)
+        assertEquals(expectedWorkouts, localDataSource.workouts?.toExternal())
     }
 
     @Test
-    fun completeTask_completesTaskToServiceAPIUpdatesCache() = testScope.runTest {
-        // Save a task
-        val newTaskId = taskRepository.createTask(newTask.title, newTask.description)
+    fun completeWorkout_completesWorkoutToServiceAPIUpdatesCache() = testScope.runTest {
+        // Save a workout
+        val newWorkoutId = workoutRepository.createWorkout(newWorkout.title, newWorkout.description)
 
         // Make sure it's active
-        assertThat(taskRepository.getTask(newTaskId)?.isCompleted).isFalse()
+        assertThat(workoutRepository.getWorkout(newWorkoutId)?.isCompleted).isFalse()
 
         // Mark is as complete
-        taskRepository.completeTask(newTaskId)
+        workoutRepository.completeWorkout(newWorkoutId)
 
         // Verify it's now completed
-        assertThat(taskRepository.getTask(newTaskId)?.isCompleted).isTrue()
+        assertThat(workoutRepository.getWorkout(newWorkoutId)?.isCompleted).isTrue()
     }
 
     @Test
-    fun completeTask_activeTaskToServiceAPIUpdatesCache() = testScope.runTest {
-        // Save a task
-        val newTaskId = taskRepository.createTask(newTask.title, newTask.description)
-        taskRepository.completeTask(newTaskId)
+    fun completeWorkout_activeWorkoutToServiceAPIUpdatesCache() = testScope.runTest {
+        // Save a workout
+        val newWorkoutId = workoutRepository.createWorkout(newWorkout.title, newWorkout.description)
+        workoutRepository.completeWorkout(newWorkoutId)
 
         // Make sure it's completed
-        assertThat(taskRepository.getTask(newTaskId)?.isActive).isFalse()
+        assertThat(workoutRepository.getWorkout(newWorkoutId)?.isActive).isFalse()
 
         // Mark is as active
-        taskRepository.activateTask(newTaskId)
+        workoutRepository.activateWorkout(newWorkoutId)
 
         // Verify it's now activated
-        assertThat(taskRepository.getTask(newTaskId)?.isActive).isTrue()
+        assertThat(workoutRepository.getWorkout(newWorkoutId)?.isActive).isTrue()
     }
 
     @Test
-    fun getTask_repositoryCachesAfterFirstApiCall() = testScope.runTest {
-        // Obtain a task from the local data source
-        localDataSource = FakeTaskDao(mutableListOf(task1.toLocal()))
-        val initial = taskRepository.getTask(task1.id)
+    fun getWorkout_repositoryCachesAfterFirstApiCall() = testScope.runTest {
+        // Obtain a workout from the local data source
+        localDataSource = FakeWorkoutDao(mutableListOf(workout1.toLocal()))
+        val initial = workoutRepository.getWorkout(workout1.id)
 
-        // Change the tasks on the remote
-        networkDataSource.tasks = newTasks.toNetwork().toMutableList()
+        // Change the workouts on the remote
+        networkDataSource.workouts = newWorkouts.toNetwork().toMutableList()
 
-        // Obtain the same task again
-        val second = taskRepository.getTask(task1.id)
+        // Obtain the same workout again
+        val second = workoutRepository.getWorkout(workout1.id)
 
-        // Initial and second tasks should match because we didn't force a refresh
+        // Initial and second workouts should match because we didn't force a refresh
         assertThat(second).isEqualTo(initial)
     }
 
     @Test
-    fun getTask_forceRefresh() = testScope.runTest {
+    fun getWorkout_forceRefresh() = testScope.runTest {
         // Trigger the repository to load data, which loads from remote and caches
-        networkDataSource.tasks = mutableListOf(task1.toNetwork())
-        val task1FirstTime = taskRepository.getTask(task1.id, forceUpdate = true)
-        assertThat(task1FirstTime?.id).isEqualTo(task1.id)
+        networkDataSource.workouts = mutableListOf(workout1.toNetwork())
+        val workout1FirstTime = workoutRepository.getWorkout(workout1.id, forceUpdate = true)
+        assertThat(workout1FirstTime?.id).isEqualTo(workout1.id)
 
-        // Configure the remote data source to return a different task
-        networkDataSource.tasks = mutableListOf(task2.toNetwork())
+        // Configure the remote data source to return a different workout
+        networkDataSource.workouts = mutableListOf(workout2.toNetwork())
 
         // Force refresh
-        val task1SecondTime = taskRepository.getTask(task1.id, true)
-        val task2SecondTime = taskRepository.getTask(task2.id, true)
+        val workout1SecondTime = workoutRepository.getWorkout(workout1.id, true)
+        val workout2SecondTime = workoutRepository.getWorkout(workout2.id, true)
 
-        // Only task2 works because task1 does not exist on the remote
-        assertThat(task1SecondTime).isNull()
-        assertThat(task2SecondTime?.id).isEqualTo(task2.id)
+        // Only workout2 works because workout1 does not exist on the remote
+        assertThat(workout1SecondTime).isNull()
+        assertThat(workout2SecondTime?.id).isEqualTo(workout2.id)
     }
 
     @Test
-    fun clearCompletedTasks() = testScope.runTest {
-        val completedTask = task1.copy(isCompleted = true)
-        localDataSource.tasks = listOf(completedTask.toLocal(), task2.toLocal())
-        taskRepository.clearCompletedTasks()
+    fun clearCompletedWorkouts() = testScope.runTest {
+        val completedWorkout = workout1.copy(isCompleted = true)
+        localDataSource.workouts = listOf(completedWorkout.toLocal(), workout2.toLocal())
+        workoutRepository.clearCompletedWorkouts()
 
-        val tasks = taskRepository.getTasks(true)
+        val workouts = workoutRepository.getWorkouts(true)
 
-        assertThat(tasks).hasSize(1)
-        assertThat(tasks).contains(task2)
-        assertThat(tasks).doesNotContain(completedTask)
+        assertThat(workouts).hasSize(1)
+        assertThat(workouts).contains(workout2)
+        assertThat(workouts).doesNotContain(completedWorkout)
     }
 
     @Test
-    fun deleteAllTasks() = testScope.runTest {
-        val initialTasks = taskRepository.getTasks()
+    fun deleteAllWorkouts() = testScope.runTest {
+        val initialWorkouts = workoutRepository.getWorkouts()
 
-        // Verify tasks are returned
-        assertThat(initialTasks.size).isEqualTo(1)
+        // Verify workouts are returned
+        assertThat(initialWorkouts.size).isEqualTo(1)
 
-        // Delete all tasks
-        taskRepository.deleteAllTasks()
+        // Delete all workouts
+        workoutRepository.deleteAllWorkouts()
 
-        // Verify tasks are empty now
-        val afterDeleteTasks = taskRepository.getTasks()
-        assertThat(afterDeleteTasks).isEmpty()
+        // Verify workouts are empty now
+        val afterDeleteWorkouts = workoutRepository.getWorkouts()
+        assertThat(afterDeleteWorkouts).isEmpty()
     }
 
     @Test
-    fun deleteSingleTask() = testScope.runTest {
-        val initialTasksSize = taskRepository.getTasks(true).size
+    fun deleteSingleWorkout() = testScope.runTest {
+        val initialWorkoutsSize = workoutRepository.getWorkouts(true).size
 
-        // Delete first task
-        taskRepository.deleteTask(task1.id)
+        // Delete first workout
+        workoutRepository.deleteWorkout(workout1.id)
 
         // Fetch data again
-        val afterDeleteTasks = taskRepository.getTasks(true)
+        val afterDeleteWorkouts = workoutRepository.getWorkouts(true)
 
-        // Verify only one task was deleted
-        assertThat(afterDeleteTasks.size).isEqualTo(initialTasksSize - 1)
-        assertThat(afterDeleteTasks).doesNotContain(task1)
+        // Verify only one workout was deleted
+        assertThat(afterDeleteWorkouts.size).isEqualTo(initialWorkoutsSize - 1)
+        assertThat(afterDeleteWorkouts).doesNotContain(workout1)
     }
 }
