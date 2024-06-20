@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.taskdetail
+package com.example.android.architecture.blueprints.todoapp.workoutdetail
 
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
@@ -27,7 +27,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -40,13 +40,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Integration test for the Task Details screen.
+ * Integration test for the Workout Details screen.
  */
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 @ExperimentalCoroutinesApi
-class TaskDetailScreenTest {
+class WorkoutDetailScreenTest {
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -55,7 +55,7 @@ class TaskDetailScreenTest {
     val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     @Inject
-    lateinit var repository: TaskRepository
+    lateinit var repository: WorkoutRepository
 
     @Before
     fun setup() {
@@ -63,53 +63,53 @@ class TaskDetailScreenTest {
     }
 
     @Test
-    fun activeTaskDetails_DisplayedInUi() = runTest {
-        // GIVEN - Add active (incomplete) task to the DB
-        val activeTaskId = repository.createTask(
-            title = "Active Task",
+    fun activeWorkoutDetails_DisplayedInUi() = runTest {
+        // GIVEN - Add active (incomplete) workout to the DB
+        val activeWorkoutId = repository.createWorkout(
+            title = "Active Workout",
             description = "AndroidX Rocks"
         )
 
         // WHEN - Details screen is opened
-        setContent(activeTaskId)
+        setContent(activeWorkoutId)
 
-        // THEN - Task details are displayed on the screen
+        // THEN - Workout details are displayed on the screen
         // make sure that the title/description are both shown and correct
-        composeTestRule.onNodeWithText("Active Task").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Active Workout").assertIsDisplayed()
         composeTestRule.onNodeWithText("AndroidX Rocks").assertIsDisplayed()
         // and make sure the "active" checkbox is shown unchecked
         composeTestRule.onNode(isToggleable()).assertIsOff()
     }
 
     @Test
-    fun completedTaskDetails_DisplayedInUi() = runTest {
-        // GIVEN - Add completed task to the DB
-        val completedTaskId = repository.createTask("Completed Task", "AndroidX Rocks")
-        repository.completeTask(completedTaskId)
+    fun completedWorkoutDetails_DisplayedInUi() = runTest {
+        // GIVEN - Add completed workout to the DB
+        val completedWorkoutId = repository.createWorkout("Completed Workout", "AndroidX Rocks")
+        repository.completeWorkout(completedWorkoutId)
 
         // WHEN - Details screen is opened
-        setContent(completedTaskId)
+        setContent(completedWorkoutId)
 
-        // THEN - Task details are displayed on the screen
+        // THEN - Workout details are displayed on the screen
         // make sure that the title/description are both shown and correct
-        composeTestRule.onNodeWithText("Completed Task").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Completed Workout").assertIsDisplayed()
         composeTestRule.onNodeWithText("AndroidX Rocks").assertIsDisplayed()
         // and make sure the "active" checkbox is shown unchecked
         composeTestRule.onNode(isToggleable()).assertIsOn()
     }
 
-    private fun setContent(activeTaskId: String) {
+    private fun setContent(activeWorkoutId: String) {
         composeTestRule.setContent {
             AppCompatTheme {
                 Surface {
-                    TaskDetailScreen(
-                        viewModel = TaskDetailViewModel(
+                    WorkoutDetailScreen(
+                        viewModel = WorkoutDetailViewModel(
                             repository,
-                            SavedStateHandle(mapOf("taskId" to activeTaskId))
+                            SavedStateHandle(mapOf("workoutId" to activeWorkoutId))
                         ),
-                        onEditTask = { /*TODO*/ },
+                        onEditWorkout = { /*TODO*/ },
                         onBack = { },
-                        onDeleteTask = { },
+                        onDeleteWorkout = { },
                     )
                 }
             }

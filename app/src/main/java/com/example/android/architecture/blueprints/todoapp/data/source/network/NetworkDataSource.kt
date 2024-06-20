@@ -17,12 +17,12 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.network
 
 /**
- * Main entry point for accessing tasks data from the network.
+ * Main entry point for accessing workouts data from the network.
  *
  */
 interface NetworkDataSource {
 
-    suspend fun loadTasks(): List<NetworkTask>
+    suspend fun loadWorkouts(): List<NetworkWorkout>
 
-    suspend fun saveTasks(tasks: List<NetworkTask>)
+    suspend fun saveWorkouts(newWorkouts: List<NetworkWorkout>)
 }

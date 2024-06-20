@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.workouts
 
 /**
- * Used with the filter spinner in the tasks list.
+ * Used with the filter spinner in the workouts list.
  */
-enum class TasksFilterType {
+enum class WorkoutsFilterType {
     /**
-     * Do not filter tasks.
+     * Do not filter workouts.
      */
-    ALL_TASKS,
+    ALL_WORKOUTS,
 
     /**
-     * Filters only the active (not completed yet) tasks.
+     * Filters only the active (not completed yet) workouts.
      */
-    ACTIVE_TASKS,
+    ACTIVE_WORKOUTS,
 
     /**
-     * Filters only the completed tasks.
+     * Filters only the completed workouts.
      */
-    COMPLETED_TASKS
+    COMPLETED_WORKOUTS
 }

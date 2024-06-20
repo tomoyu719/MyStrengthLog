@@ -17,11 +17,11 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.network
 
 class FakeNetworkDataSource(
-    var tasks: MutableList<NetworkTask>? = mutableListOf()
+    var workouts: MutableList<NetworkWorkout>? = mutableListOf()
 ) : NetworkDataSource {
-    override suspend fun loadTasks() = tasks ?: throw Exception("Task list is null")
+    override suspend fun loadWorkouts() = workouts ?: throw Exception("Workout list is null")
 
-    override suspend fun saveTasks(tasks: List<NetworkTask>) {
-        this.tasks = tasks.toMutableList()
+    override suspend fun saveWorkouts(newWorkouts: List<NetworkWorkout>) {
+        workouts = newWorkouts.toMutableList()
     }
 }

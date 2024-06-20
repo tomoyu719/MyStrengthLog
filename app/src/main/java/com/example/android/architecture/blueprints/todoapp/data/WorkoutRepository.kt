@@ -21,31 +21,31 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Interface to the data layer.
  */
-interface TaskRepository {
+interface WorkoutRepository {
 
-    fun getTasksStream(): Flow<List<Task>>
+    fun getWorkoutsStream(): Flow<List<Workout>>
 
-    suspend fun getTasks(forceUpdate: Boolean = false): List<Task>
+    suspend fun getWorkouts(forceUpdate: Boolean = false): List<Workout>
 
     suspend fun refresh()
 
-    fun getTaskStream(taskId: String): Flow<Task?>
+    fun getWorkoutStream(workoutId: String): Flow<Workout?>
 
-    suspend fun getTask(taskId: String, forceUpdate: Boolean = false): Task?
+    suspend fun getWorkout(workoutId: String, forceUpdate: Boolean = false): Workout?
 
-    suspend fun refreshTask(taskId: String)
+    suspend fun refreshWorkout(workoutId: String)
 
-    suspend fun createTask(title: String, description: String): String
+    suspend fun createWorkout(title: String, description: String): String
 
-    suspend fun updateTask(taskId: String, title: String, description: String)
+    suspend fun updateWorkout(workoutId: String, title: String, description: String)
 
-    suspend fun completeTask(taskId: String)
+    suspend fun completeWorkout(workoutId: String)
 
-    suspend fun activateTask(taskId: String)
+    suspend fun activateWorkout(workoutId: String)
 
-    suspend fun clearCompletedTasks()
+    suspend fun clearCompletedWorkouts()
 
-    suspend fun deleteAllTasks()
+    suspend fun deleteAllWorkouts()
 
-    suspend fun deleteTask(taskId: String)
+    suspend fun deleteWorkout(workoutId: String)
 }

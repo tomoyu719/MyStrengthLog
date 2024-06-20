@@ -57,8 +57,8 @@ fun StatisticsScreen(
         StatisticsContent(
             loading = uiState.isLoading,
             empty = uiState.isEmpty,
-            activeTasksPercent = uiState.activeTasksPercent,
-            completedTasksPercent = uiState.completedTasksPercent,
+            activeWorkoutsPercent = uiState.activeWorkoutsPercent,
+            completedWorkoutsPercent = uiState.completedWorkoutsPercent,
             onRefresh = { viewModel.refresh() },
             modifier = modifier.padding(paddingValues)
         )
@@ -67,12 +67,12 @@ fun StatisticsScreen(
 
 @Composable
 private fun StatisticsContent(
-    loading: Boolean,
-    empty: Boolean,
-    activeTasksPercent: Float,
-    completedTasksPercent: Float,
-    onRefresh: () -> Unit,
-    modifier: Modifier = Modifier
+        loading: Boolean,
+        empty: Boolean,
+        activeWorkoutsPercent: Float,
+        completedWorkoutsPercent: Float,
+        onRefresh: () -> Unit,
+        modifier: Modifier = Modifier
 ) {
     val commonModifier = modifier
         .fillMaxWidth()
@@ -85,7 +85,7 @@ private fun StatisticsContent(
         modifier = modifier,
         emptyContent = {
             Text(
-                text = stringResource(id = R.string.statistics_no_tasks),
+                text = stringResource(id = R.string.statistics_no_workouts),
                 modifier = commonModifier
             )
         }
@@ -96,11 +96,11 @@ private fun StatisticsContent(
                 .verticalScroll(rememberScrollState())
         ) {
             if (!loading) {
-                Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
+                Text(stringResource(id = R.string.statistics_active_workouts, activeWorkoutsPercent))
                 Text(
                     stringResource(
-                        id = R.string.statistics_completed_tasks,
-                        completedTasksPercent
+                        id = R.string.statistics_completed_workouts,
+                        completedWorkoutsPercent
                     )
                 )
             }
@@ -116,8 +116,8 @@ fun StatisticsContentPreview() {
             StatisticsContent(
                 loading = false,
                 empty = false,
-                activeTasksPercent = 80f,
-                completedTasksPercent = 20f,
+                activeWorkoutsPercent = 80f,
+                completedWorkoutsPercent = 20f,
                 onRefresh = { }
             )
         }
@@ -132,8 +132,8 @@ fun StatisticsContentEmptyPreview() {
             StatisticsContent(
                 loading = false,
                 empty = true,
-                activeTasksPercent = 0f,
-                completedTasksPercent = 0f,
+                activeWorkoutsPercent = 0f,
+                completedWorkoutsPercent = 0f,
                 onRefresh = { }
             )
         }

@@ -17,8 +17,8 @@
 package com.example.android.architecture.blueprints.todoapp.statistics
 
 import com.example.android.architecture.blueprints.todoapp.MainCoroutineRule
-import com.example.android.architecture.blueprints.todoapp.data.FakeTaskRepository
-import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.FakeWorkoutRepository
+import com.example.android.architecture.blueprints.todoapp.data.Workout
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,7 +42,7 @@ class StatisticsViewModelTest {
     private lateinit var statisticsViewModel: StatisticsViewModel
 
     // Use a fake repository to be injected into the viewmodel
-    private lateinit var tasksRepository: FakeTaskRepository
+    private lateinit var workoutsRepository: FakeWorkoutRepository
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -51,13 +51,13 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
-        tasksRepository = FakeTaskRepository()
-        statisticsViewModel = StatisticsViewModel(tasksRepository)
+        workoutsRepository = FakeWorkoutRepository()
+        statisticsViewModel = StatisticsViewModel(workoutsRepository)
     }
 
     @Test
-    fun loadEmptyTasksFromRepository_EmptyResults() = runTest {
-        // Given an initialized StatisticsViewModel with no tasks
+    fun loadEmptyWorkoutsFromRepository_EmptyResults() = runTest {
+        // Given an initialized StatisticsViewModel with no workouts
 
         // Then the results are empty
         val uiState = statisticsViewModel.uiState.first()
@@ -65,24 +65,24 @@ class StatisticsViewModelTest {
     }
 
     @Test
-    fun loadNonEmptyTasksFromRepository_NonEmptyResults() = runTest {
-        // We initialise the tasks to 3, with one active and two completed
-        val task1 = Task(id = "1", title = "Title1", description = "Desc1")
-        val task2 = Task(id = "2", title = "Title2", description = "Desc2", isCompleted = true)
-        val task3 = Task(id = "3", title = "Title3", description = "Desc3", isCompleted = true)
-        val task4 = Task(id = "4", title = "Title4", description = "Desc4", isCompleted = true)
-        tasksRepository.addTasks(task1, task2, task3, task4)
+    fun loadNonEmptyWorkoutsFromRepository_NonEmptyResults() = runTest {
+        // We initialise the workouts to 3, with one active and two completed
+        val workout1 = Workout(id = "1", title = "Title1", description = "Desc1")
+        val workout2 = Workout(id = "2", title = "Title2", description = "Desc2", isCompleted = true)
+        val workout3 = Workout(id = "3", title = "Title3", description = "Desc3", isCompleted = true)
+        val workout4 = Workout(id = "4", title = "Title4", description = "Desc4", isCompleted = true)
+        workoutsRepository.addWorkouts(workout1, workout2, workout3, workout4)
 
         // Then the results are not empty
         val uiState = statisticsViewModel.uiState.first()
         assertThat(uiState.isEmpty).isFalse()
-        assertThat(uiState.activeTasksPercent).isEqualTo(25f)
-        assertThat(uiState.completedTasksPercent).isEqualTo(75f)
+        assertThat(uiState.activeWorkoutsPercent).isEqualTo(25f)
+        assertThat(uiState.completedWorkoutsPercent).isEqualTo(75f)
         assertThat(uiState.isLoading).isEqualTo(false)
     }
 
     @Test
-    fun loadTasks_loading() = runTest {
+    fun loadWorkouts_loading() = runTest {
         // Set Main dispatcher to not run coroutines eagerly, for just this one test
         Dispatchers.setMain(StandardTestDispatcher())
 

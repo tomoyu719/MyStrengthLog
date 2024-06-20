@@ -40,20 +40,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.TASK_ID_ARG
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.TITLE_ARG
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.USER_MESSAGE_ARG
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskScreen
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs.WORKOUT_ID_ARG
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs.TITLE_ARG
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs.USER_MESSAGE_ARG
+import com.example.android.architecture.blueprints.todoapp.addeditworkout.AddEditWorkoutScreen
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsScreen
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailScreen
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksScreen
+import com.example.android.architecture.blueprints.todoapp.workoutdetail.WorkoutDetailScreen
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsScreen
 
 @Composable
-fun TodoNavGraph(
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = TodoDestinations.TASKS_ROUTE,
-    navActions: TodoNavigationActions = remember(navController) {
-        TodoNavigationActions(navController)
+fun MyStrengthLogNavGraph(
+        navController: NavHostController = rememberNavController(),
+        startDestination: String = MyStrengthLogDestinations.WORKOUTS_ROUTE,
+        navActions: MyStrengthLogNavigationActions = remember(navController) {
+        MyStrengthLogNavigationActions(navController)
     }
 ) {
     Scaffold(
@@ -79,47 +79,47 @@ fun TodoNavGraph(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(
-                TodoDestinations.TASKS_ROUTE,
+                MyStrengthLogDestinations.WORKOUTS_ROUTE,
                 arguments = listOf(
                     navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
                 )
             ) { entry ->
-                TasksScreen(
+                WorkoutsScreen(
                     userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
                     onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
-                    onAddTask = { navActions.navigateToAddEditTask(R.string.add_task, null) },
-                    onTaskClick = { task -> navActions.navigateToTaskDetail(task.id) },
+                    onAddWorkout = { navActions.navigateToAddEditWorkout(R.string.add_workout, null) },
+                    onWorkoutClick = { workout -> navActions.navigateToWorkoutDetail(workout.id) },
                 )
 
             }
-            composable(TodoDestinations.STATISTICS_ROUTE) {
+            composable(MyStrengthLogDestinations.STATISTICS_ROUTE) {
                 StatisticsScreen()
             }
             composable(
-                TodoDestinations.ADD_EDIT_TASK_ROUTE,
+                MyStrengthLogDestinations.ADD_EDIT_WORKOUT_ROUTE,
                 arguments = listOf(
                     navArgument(TITLE_ARG) { type = NavType.IntType },
-                    navArgument(TASK_ID_ARG) { type = NavType.StringType; nullable = true },
+                    navArgument(WORKOUT_ID_ARG) { type = NavType.StringType; nullable = true },
                 )
             ) { entry ->
-                val taskId = entry.arguments?.getString(TASK_ID_ARG)
-                AddEditTaskScreen(
+                val workoutId = entry.arguments?.getString(WORKOUT_ID_ARG)
+                AddEditWorkoutScreen(
                     topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
-                    onTaskUpdate = {
-                        navActions.navigateToTasks(
-                            if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
+                    onWorkoutUpdate = {
+                        navActions.navigateToWorkouts(
+                            if (workoutId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                         )
                     },
                     onBack = { navController.popBackStack() }
                 )
             }
-            composable(TodoDestinations.TASK_DETAIL_ROUTE) {
-                TaskDetailScreen(
-                    onEditTask = { taskId ->
-                        navActions.navigateToAddEditTask(R.string.edit_task, taskId)
+            composable(MyStrengthLogDestinations.WORKOUT_DETAIL_ROUTE) {
+                WorkoutDetailScreen(
+                    onEditWorkout = { workoutId ->
+                        navActions.navigateToAddEditWorkout(R.string.edit_workout, workoutId)
                     },
                     onBack = { navController.popBackStack() },
-                    onDeleteTask = { navActions.navigateToTasks(DELETE_RESULT_OK) }
+                    onDeleteWorkout = { navActions.navigateToWorkouts(DELETE_RESULT_OK) }
                 )
             }
         }
@@ -133,13 +133,13 @@ const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
 
 //    sealed class Screen(val route: String, @StringRes val resourceId: Int) {
 sealed class Screen(val route: String, val icon: ImageVector, @StringRes val resourceId: Int) {
-    object Tasks : Screen(TodoDestinations.TASKS_ROUTE, Icons.Default.List, R.string.list_title)
+    object Workouts : Screen(MyStrengthLogDestinations.WORKOUTS_ROUTE, Icons.Default.List, R.string.list_title)
 
     object Statistics :
-        Screen(TodoDestinations.STATISTICS_ROUTE, Icons.Default.Info, R.string.statistics_title)
+        Screen(MyStrengthLogDestinations.STATISTICS_ROUTE, Icons.Default.Info, R.string.statistics_title)
 }
 
 val items = listOf(
-    Screen.Tasks,
+    Screen.Workouts,
     Screen.Statistics,
 )

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.taskdetail
+package com.example.android.architecture.blueprints.todoapp.workoutdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.WorkoutDestinationsArgs
+import com.example.android.architecture.blueprints.todoapp.data.Workout
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,50 +38,50 @@ import kotlinx.coroutines.launch
 /**
  * UiState for the Details screen.
  */
-data class TaskDetailUiState(
-    val task: Task? = null,
-    val isLoading: Boolean = false,
-    val userMessage: Int? = null,
-    val isTaskDeleted: Boolean = false
+data class WorkoutDetailUiState(
+        val workout: Workout? = null,
+        val isLoading: Boolean = false,
+        val userMessage: Int? = null,
+        val isWorkoutDeleted: Boolean = false
 )
 
 /**
  * ViewModel for the Details screen.
  */
 @HiltViewModel
-class TaskDetailViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
-    savedStateHandle: SavedStateHandle
+class WorkoutDetailViewModel @Inject constructor(
+        private val workoutRepository: WorkoutRepository,
+        savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val taskId: String = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]!!
+    val workoutId: String = savedStateHandle[WorkoutDestinationsArgs.WORKOUT_ID_ARG]!!
 
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val _isTaskDeleted = MutableStateFlow(false)
-    private val _taskAsync = taskRepository.getTaskStream(taskId)
-        .map { handleTask(it) }
-        .catch { emit(Async.Error(R.string.loading_task_error)) }
+    private val _isWorkoutDeleted = MutableStateFlow(false)
+    private val _workoutAsync = workoutRepository.getWorkoutStream(workoutId)
+        .map { handleWorkout(it) }
+        .catch { emit(Async.Error(R.string.loading_workout_error)) }
 
-    val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage, _isLoading, _isTaskDeleted, _taskAsync
-    ) { userMessage, isLoading, isTaskDeleted, taskAsync ->
-        when (taskAsync) {
+    val uiState: StateFlow<WorkoutDetailUiState> = combine(
+        _userMessage, _isLoading, _isWorkoutDeleted, _workoutAsync
+    ) { userMessage, isLoading, isWorkoutDeleted, workoutAsync ->
+        when (workoutAsync) {
             Async.Loading -> {
-                TaskDetailUiState(isLoading = true)
+                WorkoutDetailUiState(isLoading = true)
             }
             is Async.Error -> {
-                TaskDetailUiState(
-                    userMessage = taskAsync.errorMessage,
-                    isTaskDeleted = isTaskDeleted
+                WorkoutDetailUiState(
+                    userMessage = workoutAsync.errorMessage,
+                    isWorkoutDeleted = isWorkoutDeleted
                 )
             }
             is Async.Success -> {
-                TaskDetailUiState(
-                    task = taskAsync.data,
+                WorkoutDetailUiState(
+                    workout = workoutAsync.data,
                     isLoading = isLoading,
                     userMessage = userMessage,
-                    isTaskDeleted = isTaskDeleted
+                    isWorkoutDeleted = isWorkoutDeleted
                 )
             }
         }
@@ -89,29 +89,29 @@ class TaskDetailViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = TaskDetailUiState(isLoading = true)
+            initialValue = WorkoutDetailUiState(isLoading = true)
         )
 
-    fun deleteTask() = viewModelScope.launch {
-        taskRepository.deleteTask(taskId)
-        _isTaskDeleted.value = true
+    fun deleteWorkout() = viewModelScope.launch {
+        workoutRepository.deleteWorkout(workoutId)
+        _isWorkoutDeleted.value = true
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
-        val task = uiState.value.task ?: return@launch
+        val workout = uiState.value.workout ?: return@launch
         if (completed) {
-            taskRepository.completeTask(task.id)
-            showSnackbarMessage(R.string.task_marked_complete)
+            workoutRepository.completeWorkout(workout.id)
+            showSnackbarMessage(R.string.workout_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
-            showSnackbarMessage(R.string.task_marked_active)
+            workoutRepository.activateWorkout(workout.id)
+            showSnackbarMessage(R.string.workout_marked_active)
         }
     }
 
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            taskRepository.refreshTask(taskId)
+            workoutRepository.refreshWorkout(workoutId)
             _isLoading.value = false
         }
     }
@@ -124,10 +124,10 @@ class TaskDetailViewModel @Inject constructor(
         _userMessage.value = message
     }
 
-    private fun handleTask(task: Task?): Async<Task?> {
-        if (task == null) {
-            return Async.Error(R.string.task_not_found)
+    private fun handleWorkout(workout: Workout?): Async<Workout?> {
+        if (workout == null) {
+            return Async.Error(R.string.workout_not_found)
         }
-        return Async.Success(task)
+        return Async.Success(workout)
     }
 }

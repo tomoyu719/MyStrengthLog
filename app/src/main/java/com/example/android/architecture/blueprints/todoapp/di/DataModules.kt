@@ -18,12 +18,12 @@ package com.example.android.architecture.blueprints.todoapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.android.architecture.blueprints.todoapp.data.DefaultTaskRepository
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDao
-import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
+import com.example.android.architecture.blueprints.todoapp.data.DefaultWorkoutRepository
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
+import com.example.android.architecture.blueprints.todoapp.data.source.local.WorkoutDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.MyStrengthLogDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskNetworkDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.network.WorkoutNetworkDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -38,7 +38,7 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindTaskRepository(repository: DefaultTaskRepository): TaskRepository
+    abstract fun bindWorkoutRepository(repository: DefaultWorkoutRepository): WorkoutRepository
 }
 
 @Module
@@ -47,7 +47,7 @@ abstract class DataSourceModule {
 
     @Singleton
     @Binds
-    abstract fun bindNetworkDataSource(dataSource: TaskNetworkDataSource): NetworkDataSource
+    abstract fun bindNetworkDataSource(dataSource: WorkoutNetworkDataSource): NetworkDataSource
 }
 
 @Module
@@ -56,14 +56,14 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDataBase(@ApplicationContext context: Context): ToDoDatabase {
+    fun provideDataBase(@ApplicationContext context: Context): MyStrengthLogDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
-            ToDoDatabase::class.java,
-            "Tasks.db"
+            MyStrengthLogDatabase::class.java,
+            "Workouts.db"
         ).build()
     }
 
     @Provides
-    fun provideTaskDao(database: ToDoDatabase): TaskDao = database.taskDao()
+    fun provideWorkoutDao(database: MyStrengthLogDatabase): WorkoutDao = database.workoutDao()
 }

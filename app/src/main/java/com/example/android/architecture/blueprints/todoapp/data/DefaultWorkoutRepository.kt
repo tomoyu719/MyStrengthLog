@@ -16,7 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.WorkoutDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.di.ApplicationScope
 import com.example.android.architecture.blueprints.todoapp.di.DefaultDispatcher
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
+ * Default implementation of [WorkoutRepository]. Single entry point for managing workouts' data.
  *
  * @param networkDataSource - The network data source
  * @param localDataSource - The local data source
@@ -41,40 +41,40 @@ import kotlinx.coroutines.withContext
  * as sending data to the network.
  */
 @Singleton
-class DefaultTaskRepository @Inject constructor(
-    private val networkDataSource: NetworkDataSource,
-    private val localDataSource: TaskDao,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope,
-) : TaskRepository {
+class DefaultWorkoutRepository @Inject constructor(
+        private val networkDataSource: NetworkDataSource,
+        private val localDataSource: WorkoutDao,
+        @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
+        @ApplicationScope private val scope: CoroutineScope,
+) : WorkoutRepository {
 
-    override suspend fun createTask(title: String, description: String): String {
+    override suspend fun createWorkout(title: String, description: String): String {
         // ID creation might be a complex operation so it's executed using the supplied
         // coroutine dispatcher
-        val taskId = withContext(dispatcher) {
+        val workoutId = withContext(dispatcher) {
             UUID.randomUUID().toString()
         }
-        val task = Task(
+        val workout = Workout(
             title = title,
             description = description,
-            id = taskId,
+            id = workoutId,
         )
-        localDataSource.upsert(task.toLocal())
-        saveTasksToNetwork()
-        return taskId
+        localDataSource.upsert(workout.toLocal())
+        saveWorkoutsToNetwork()
+        return workoutId
     }
 
-    override suspend fun updateTask(taskId: String, title: String, description: String) {
-        val task = getTask(taskId)?.copy(
+    override suspend fun updateWorkout(workoutId: String, title: String, description: String) {
+        val workout = getWorkout(workoutId)?.copy(
             title = title,
             description = description
-        ) ?: throw Exception("Task (id $taskId) not found")
+        ) ?: throw Exception("Workout (id $workoutId) not found")
 
-        localDataSource.upsert(task.toLocal())
-        saveTasksToNetwork()
+        localDataSource.upsert(workout.toLocal())
+        saveWorkoutsToNetwork()
     }
 
-    override suspend fun getTasks(forceUpdate: Boolean): List<Task> {
+    override suspend fun getWorkouts(forceUpdate: Boolean): List<Workout> {
         if (forceUpdate) {
             refresh()
         }
@@ -83,62 +83,62 @@ class DefaultTaskRepository @Inject constructor(
         }
     }
 
-    override fun getTasksStream(): Flow<List<Task>> {
-        return localDataSource.observeAll().map { tasks ->
+    override fun getWorkoutsStream(): Flow<List<Workout>> {
+        return localDataSource.observeAll().map { workouts ->
             withContext(dispatcher) {
-                tasks.toExternal()
+                workouts.toExternal()
             }
         }
     }
 
-    override suspend fun refreshTask(taskId: String) {
+    override suspend fun refreshWorkout(workoutId: String) {
         refresh()
     }
 
-    override fun getTaskStream(taskId: String): Flow<Task?> {
-        return localDataSource.observeById(taskId).map { it.toExternal() }
+    override fun getWorkoutStream(workoutId: String): Flow<Workout?> {
+        return localDataSource.observeById(workoutId).map { it.toExternal() }
     }
 
     /**
-     * Get a Task with the given ID. Will return null if the task cannot be found.
+     * Get a Workout with the given ID. Will return null if the workout cannot be found.
      *
-     * @param taskId - The ID of the task
-     * @param forceUpdate - true if the task should be updated from the network data source first.
+     * @param workoutId - The ID of the workout
+     * @param forceUpdate - true if the workout should be updated from the network data source first.
      */
-    override suspend fun getTask(taskId: String, forceUpdate: Boolean): Task? {
+    override suspend fun getWorkout(workoutId: String, forceUpdate: Boolean): Workout? {
         if (forceUpdate) {
             refresh()
         }
-        return localDataSource.getById(taskId)?.toExternal()
+        return localDataSource.getById(workoutId)?.toExternal()
     }
 
-    override suspend fun completeTask(taskId: String) {
-        localDataSource.updateCompleted(taskId = taskId, completed = true)
-        saveTasksToNetwork()
+    override suspend fun completeWorkout(workoutId: String) {
+        localDataSource.updateCompleted(workoutId = workoutId, completed = true)
+        saveWorkoutsToNetwork()
     }
 
-    override suspend fun activateTask(taskId: String) {
-        localDataSource.updateCompleted(taskId = taskId, completed = false)
-        saveTasksToNetwork()
+    override suspend fun activateWorkout(workoutId: String) {
+        localDataSource.updateCompleted(workoutId = workoutId, completed = false)
+        saveWorkoutsToNetwork()
     }
 
-    override suspend fun clearCompletedTasks() {
+    override suspend fun clearCompletedWorkouts() {
         localDataSource.deleteCompleted()
-        saveTasksToNetwork()
+        saveWorkoutsToNetwork()
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun deleteAllWorkouts() {
         localDataSource.deleteAll()
-        saveTasksToNetwork()
+        saveWorkoutsToNetwork()
     }
 
-    override suspend fun deleteTask(taskId: String) {
-        localDataSource.deleteById(taskId)
-        saveTasksToNetwork()
+    override suspend fun deleteWorkout(workoutId: String) {
+        localDataSource.deleteById(workoutId)
+        saveWorkoutsToNetwork()
     }
 
     /**
-     * The following methods load tasks from (refresh), and save tasks to, the network.
+     * The following methods load workouts from (refresh), and save workouts to, the network.
      *
      * Real apps may want to do a proper sync, rather than the "one-way sync everything" approach
      * below. See https://developer.android.com/topic/architecture/data-layer/offline-first
@@ -156,28 +156,28 @@ class DefaultTaskRepository @Inject constructor(
      */
     override suspend fun refresh() {
         withContext(dispatcher) {
-            val remoteTasks = networkDataSource.loadTasks()
+            val remoteWorkouts = networkDataSource.loadWorkouts()
             localDataSource.deleteAll()
-            localDataSource.upsertAll(remoteTasks.toLocal())
+            localDataSource.upsertAll(remoteWorkouts.toLocal())
         }
     }
 
     /**
-     * Send the tasks from the local data source to the network data source
+     * Send the workouts from the local data source to the network data source
      *
      * Returns immediately after launching the job. Real apps may want to suspend here until the
      * operation is complete or (better) use WorkManager to schedule this work. Both approaches
      * should provide a mechanism for failures to be communicated back to the user so that
      * they are aware that their data isn't being backed up.
      */
-    private fun saveTasksToNetwork() {
+    private fun saveWorkoutsToNetwork() {
         scope.launch {
             try {
-                val localTasks = localDataSource.getAll()
-                val networkTasks = withContext(dispatcher) {
-                    localTasks.toNetwork()
+                val localWorkouts = localDataSource.getAll()
+                val networkWorkouts = withContext(dispatcher) {
+                    localWorkouts.toNetwork()
                 }
-                networkDataSource.saveTasks(networkTasks)
+                networkDataSource.saveWorkouts(networkWorkouts)
             } catch (e: Exception) {
                 // In a real app you'd handle the exception e.g. by exposing a `networkStatus` flow
                 // to an app level UI state holder which could then display a Toast message.

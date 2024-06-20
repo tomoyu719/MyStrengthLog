@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.workouts
 
 import androidx.annotation.StringRes
 import androidx.compose.material.Surface
@@ -29,7 +29,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
 import com.google.accompanist.appcompattheme.AppCompatTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -42,7 +42,7 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 
 /**
- * Integration test for the Task List screen.
+ * Integration test for the Workout List screen.
  */
 // TODO - Move to the sharedTest folder when https://issuetracker.google.com/224974381 is fixed
 @RunWith(AndroidJUnit4::class)
@@ -51,7 +51,7 @@ import javax.inject.Inject
 // @TextLayoutMode(TextLayoutMode.Mode.REALISTIC)
 @HiltAndroidTest
 @OptIn(ExperimentalCoroutinesApi::class)
-class TasksScreenTest {
+class WorkoutsScreenTest {
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -61,7 +61,7 @@ class TasksScreenTest {
     private val activity get() = composeTestRule.activity
 
     @Inject
-    lateinit var repository: TaskRepository
+    lateinit var repository: WorkoutRepository
 
     @Before
     fun init() {
@@ -69,20 +69,20 @@ class TasksScreenTest {
     }
 
     @Test
-    fun displayTask_whenRepositoryHasData() = runTest {
-        // GIVEN - One task already in the repository
-        repository.createTask("TITLE1", "DESCRIPTION1")
+    fun displayWorkout_whenRepositoryHasData() = runTest {
+        // GIVEN - One workout already in the repository
+        repository.createWorkout("TITLE1", "DESCRIPTION1")
 
         // WHEN - On startup
         setContent()
 
-        // THEN - Verify task is displayed on screen
+        // THEN - Verify workout is displayed on screen
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
     }
 
     @Test
-    fun displayActiveTask() = runTest {
-        repository.createTask("TITLE1", "DESCRIPTION1")
+    fun displayActiveWorkout() = runTest {
+        repository.createWorkout("TITLE1", "DESCRIPTION1")
 
         setContent()
 
@@ -97,9 +97,9 @@ class TasksScreenTest {
     }
 
     @Test
-    fun displayCompletedTask() = runTest {
+    fun displayCompletedWorkout() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it) }
+            createWorkout("TITLE1", "DESCRIPTION1").also { completeWorkout(it) }
         }
 
         setContent()
@@ -114,15 +114,15 @@ class TasksScreenTest {
     }
 
     @Test
-    fun markTaskAsComplete() = runTest {
-        repository.createTask("TITLE1", "DESCRIPTION1")
+    fun markWorkoutAsComplete() = runTest {
+        repository.createWorkout("TITLE1", "DESCRIPTION1")
 
         setContent()
 
-        // Mark the task as complete
+        // Mark the workout as complete
         composeTestRule.onNode(isToggleable()).performClick()
 
-        // Verify task is shown as complete
+        // Verify workout is shown as complete
         openFilterAndSelectOption(R.string.nav_all)
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         openFilterAndSelectOption(R.string.nav_active)
@@ -132,17 +132,17 @@ class TasksScreenTest {
     }
 
     @Test
-    fun markTaskAsActive() = runTest {
+    fun markWorkoutAsActive() = runTest {
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1").also { completeTask(it) }
+            createWorkout("TITLE1", "DESCRIPTION1").also { completeWorkout(it) }
         }
 
         setContent()
 
-        // Mark the task as active
+        // Mark the workout as active
         composeTestRule.onNode(isToggleable()).performClick()
 
-        // Verify task is shown as active
+        // Verify workout is shown as active
         openFilterAndSelectOption(R.string.nav_all)
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         openFilterAndSelectOption(R.string.nav_active)
@@ -152,33 +152,33 @@ class TasksScreenTest {
     }
 
     @Test
-    fun showAllTasks() = runTest {
-        // Add one active task and one completed task
+    fun showAllWorkouts() = runTest {
+        // Add one active workout and one completed workout
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
+            createWorkout("TITLE1", "DESCRIPTION1")
+            createWorkout("TITLE2", "DESCRIPTION2").also { completeWorkout(it) }
         }
 
         setContent()
 
-        // Verify that both of our tasks are shown
+        // Verify that both of our workouts are shown
         openFilterAndSelectOption(R.string.nav_all)
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
     }
 
     @Test
-    fun showActiveTasks() = runTest {
-        // Add 2 active tasks and one completed task
+    fun showActiveWorkouts() = runTest {
+        // Add 2 active workouts and one completed workout
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2")
-            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it) }
+            createWorkout("TITLE1", "DESCRIPTION1")
+            createWorkout("TITLE2", "DESCRIPTION2")
+            createWorkout("TITLE3", "DESCRIPTION3").also { completeWorkout(it) }
         }
 
         setContent()
 
-        // Verify that the active tasks (but not the completed task) are shown
+        // Verify that the active workouts (but not the completed workout) are shown
         openFilterAndSelectOption(R.string.nav_active)
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
@@ -186,17 +186,17 @@ class TasksScreenTest {
     }
 
     @Test
-    fun showCompletedTasks() = runTest {
-        // Add one active task and 2 completed tasks
+    fun showCompletedWorkouts() = runTest {
+        // Add one active workout and 2 completed workouts
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
-            createTask("TITLE3", "DESCRIPTION3").also { completeTask(it) }
+            createWorkout("TITLE1", "DESCRIPTION1")
+            createWorkout("TITLE2", "DESCRIPTION2").also { completeWorkout(it) }
+            createWorkout("TITLE3", "DESCRIPTION3").also { completeWorkout(it) }
         }
 
         setContent()
 
-        // Verify that the completed tasks (but not the active task) are shown
+        // Verify that the completed workouts (but not the active workout) are shown
         openFilterAndSelectOption(R.string.nav_completed)
         composeTestRule.onNodeWithText("TITLE1").assertDoesNotExist()
         composeTestRule.onNodeWithText("TITLE2").assertIsDisplayed()
@@ -204,11 +204,11 @@ class TasksScreenTest {
     }
 
     @Test
-    fun clearCompletedTasks() = runTest {
-        // Add one active task and one completed task
+    fun clearCompletedWorkouts() = runTest {
+        // Add one active workout and one completed workout
         repository.apply {
-            createTask("TITLE1", "DESCRIPTION1")
-            createTask("TITLE2", "DESCRIPTION2").also { completeTask(it) }
+            createWorkout("TITLE1", "DESCRIPTION1")
+            createWorkout("TITLE2", "DESCRIPTION2").also { completeWorkout(it) }
         }
 
         setContent()
@@ -220,49 +220,49 @@ class TasksScreenTest {
         composeTestRule.onNodeWithText(activity.getString(R.string.menu_clear)).performClick()
 
         openFilterAndSelectOption(R.string.nav_all)
-        // Verify that only the active task is shown
+        // Verify that only the active workout is shown
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
         composeTestRule.onNodeWithText("TITLE2").assertDoesNotExist()
     }
 
     @Test
-    fun noTasks_AllTasksFilter_AddTaskViewVisible() {
+    fun noWorkouts_AllWorkoutsFilter_AddWorkoutViewVisible() {
         setContent()
 
         openFilterAndSelectOption(R.string.nav_all)
 
-        // Verify the "You have no tasks!" text is shown
-        composeTestRule.onNodeWithText("You have no tasks!").assertIsDisplayed()
+        // Verify the "You have no workouts!" text is shown
+        composeTestRule.onNodeWithText("You have no workouts!").assertIsDisplayed()
     }
 
     @Test
-    fun noTasks_CompletedTasksFilter_AddTaskViewNotVisible() {
+    fun noWorkouts_CompletedWorkoutsFilter_AddWorkoutViewNotVisible() {
         setContent()
 
         openFilterAndSelectOption(R.string.nav_completed)
-        // Verify the "You have no completed tasks!" text is shown
-        composeTestRule.onNodeWithText("You have no completed tasks!").assertIsDisplayed()
+        // Verify the "You have no completed workouts!" text is shown
+        composeTestRule.onNodeWithText("You have no completed workouts!").assertIsDisplayed()
     }
 
     @Test
-    fun noTasks_ActiveTasksFilter_AddTaskViewNotVisible() {
+    fun noWorkouts_ActiveWorkoutsFilter_AddWorkoutViewNotVisible() {
         setContent()
 
         openFilterAndSelectOption(R.string.nav_active)
-        // Verify the "You have no active tasks!" text is shown
-        composeTestRule.onNodeWithText("You have no active tasks!").assertIsDisplayed()
+        // Verify the "You have no active workouts!" text is shown
+        composeTestRule.onNodeWithText("You have no active workouts!").assertIsDisplayed()
     }
 
     private fun setContent() {
         composeTestRule.setContent {
             AppCompatTheme {
                 Surface {
-                    TasksScreen(
-                        viewModel = TasksViewModel(repository, SavedStateHandle()),
-                        userMessage = R.string.successfully_added_task_message,
+                    WorkoutsScreen(
+                        viewModel = WorkoutsViewModel(repository, SavedStateHandle()),
+                        userMessage = R.string.successfully_added_workout_message,
                         onUserMessageDisplayed = { },
-                        onAddTask = { },
-                        onTaskClick = { },
+                        onAddWorkout = { },
+                        onWorkoutClick = { },
                     )
                 }
             }

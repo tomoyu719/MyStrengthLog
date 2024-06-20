@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.tasks
+package com.example.android.architecture.blueprints.todoapp.workouts
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -23,11 +23,11 @@ import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
-import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.COMPLETED_TASKS
+import com.example.android.architecture.blueprints.todoapp.data.Workout
+import com.example.android.architecture.blueprints.todoapp.data.WorkoutRepository
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsFilterType.ACTIVE_WORKOUTS
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsFilterType.ALL_WORKOUTS
+import com.example.android.architecture.blueprints.todoapp.workouts.WorkoutsFilterType.COMPLETED_WORKOUTS
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,50 +42,50 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * UiState for the task list screen.
+ * UiState for the Workout list screen.
  */
-data class TasksUiState(
-    val items: List<Task> = emptyList(),
-    val isLoading: Boolean = false,
-    val filteringUiInfo: FilteringUiInfo = FilteringUiInfo(),
-    val userMessage: Int? = null
+data class WorkoutsUiState(
+        val items: List<Workout> = emptyList(),
+        val isLoading: Boolean = false,
+        val filteringUiInfo: FilteringUiInfo = FilteringUiInfo(),
+        val userMessage: Int? = null
 )
 
 /**
- * ViewModel for the task list screen.
+ * ViewModel for the Workout list screen.
  */
 @HiltViewModel
-class TasksViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
-    private val savedStateHandle: SavedStateHandle
+class WorkoutsViewModel @Inject constructor(
+        private val workoutRepository: WorkoutRepository,
+        private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _savedFilterType =
-        savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
+        savedStateHandle.getStateFlow(WORKOUTS_FILTER_SAVED_STATE_KEY, ALL_WORKOUTS)
 
     private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val _filteredTasksAsync =
-        combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
-            filterTasks(tasks, type)
+    private val _filteredWorkoutsAsync =
+        combine(workoutRepository.getWorkoutsStream(), _savedFilterType) { workouts, type ->
+            filterWorkouts(workouts, type)
         }
             .map { Async.Success(it) }
-            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
+            .catch<Async<List<Workout>>> { emit(Async.Error(R.string.loading_workouts_error)) }
 
-    val uiState: StateFlow<TasksUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
-    ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
-        when (tasksAsync) {
+    val uiState: StateFlow<WorkoutsUiState> = combine(
+        _filterUiInfo, _isLoading, _userMessage, _filteredWorkoutsAsync
+    ) { filterUiInfo, isLoading, userMessage, workoutsAsync ->
+        when (workoutsAsync) {
             Async.Loading -> {
-                TasksUiState(isLoading = true)
+                WorkoutsUiState(isLoading = true)
             }
             is Async.Error -> {
-                TasksUiState(userMessage = tasksAsync.errorMessage)
+                WorkoutsUiState(userMessage = workoutsAsync.errorMessage)
             }
             is Async.Success -> {
-                TasksUiState(
-                    items = tasksAsync.data,
+                WorkoutsUiState(
+                    items = workoutsAsync.data,
                     filteringUiInfo = filterUiInfo,
                     isLoading = isLoading,
                     userMessage = userMessage
@@ -96,36 +96,36 @@ class TasksViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = TasksUiState(isLoading = true)
+            initialValue = WorkoutsUiState(isLoading = true)
         )
 
-    fun setFiltering(requestType: TasksFilterType) {
-        savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType
+    fun setFiltering(requestType: WorkoutsFilterType) {
+        savedStateHandle[WORKOUTS_FILTER_SAVED_STATE_KEY] = requestType
     }
 
-    fun clearCompletedTasks() {
+    fun clearCompletedWorkouts() {
         viewModelScope.launch {
-            taskRepository.clearCompletedTasks()
-            showSnackbarMessage(R.string.completed_tasks_cleared)
+            workoutRepository.clearCompletedWorkouts()
+            showSnackbarMessage(R.string.completed_workouts_cleared)
             refresh()
         }
     }
 
-    fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
+    fun completeWorkout(workout: Workout, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            taskRepository.completeTask(task.id)
-            showSnackbarMessage(R.string.task_marked_complete)
+            workoutRepository.completeWorkout(workout.id)
+            showSnackbarMessage(R.string.workout_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
-            showSnackbarMessage(R.string.task_marked_active)
+            workoutRepository.activateWorkout(workout.id)
+            showSnackbarMessage(R.string.workout_marked_active)
         }
     }
 
     fun showEditResultMessage(result: Int) {
         when (result) {
-            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
-            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
-            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
+            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_workout_message)
+            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_workout_message)
+            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_workout_message)
         }
     }
 
@@ -140,45 +140,45 @@ class TasksViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            taskRepository.refresh()
+            workoutRepository.refresh()
             _isLoading.value = false
         }
     }
 
-    private fun filterTasks(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
-        val tasksToShow = ArrayList<Task>()
-        // We filter the tasks based on the requestType
-        for (task in tasks) {
+    private fun filterWorkouts(workouts: List<Workout>, filteringType: WorkoutsFilterType): List<Workout> {
+        val workoutsToShow = ArrayList<Workout>()
+        // We filter the workouts based on the requestType
+        for (workout in workouts) {
             when (filteringType) {
-                ALL_TASKS -> tasksToShow.add(task)
-                ACTIVE_TASKS -> if (task.isActive) {
-                    tasksToShow.add(task)
+                ALL_WORKOUTS -> workoutsToShow.add(workout)
+                ACTIVE_WORKOUTS -> if (workout.isActive) {
+                    workoutsToShow.add(workout)
                 }
-                COMPLETED_TASKS -> if (task.isCompleted) {
-                    tasksToShow.add(task)
+                COMPLETED_WORKOUTS -> if (workout.isCompleted) {
+                    workoutsToShow.add(workout)
                 }
             }
         }
-        return tasksToShow
+        return workoutsToShow
     }
 
-    private fun getFilterUiInfo(requestType: TasksFilterType): FilteringUiInfo =
+    private fun getFilterUiInfo(requestType: WorkoutsFilterType): FilteringUiInfo =
         when (requestType) {
-            ALL_TASKS -> {
+            ALL_WORKOUTS -> {
                 FilteringUiInfo(
-                    R.string.label_all, R.string.no_tasks_all,
+                    R.string.label_all, R.string.no_workouts_all,
                     R.drawable.logo_no_fill
                 )
             }
-            ACTIVE_TASKS -> {
+            ACTIVE_WORKOUTS -> {
                 FilteringUiInfo(
-                    R.string.label_active, R.string.no_tasks_active,
+                    R.string.label_active, R.string.no_workouts_active,
                     R.drawable.ic_check_circle_96dp
                 )
             }
-            COMPLETED_TASKS -> {
+            COMPLETED_WORKOUTS -> {
                 FilteringUiInfo(
-                    R.string.label_completed, R.string.no_tasks_completed,
+                    R.string.label_completed, R.string.no_workouts_completed,
                     R.drawable.ic_verified_user_96dp
                 )
             }
@@ -186,10 +186,10 @@ class TasksViewModel @Inject constructor(
 }
 
 // Used to save the current filtering in SavedStateHandle.
-const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"
+const val WORKOUTS_FILTER_SAVED_STATE_KEY = "WORKOUTS_FILTER_SAVED_STATE_KEY"
 
 data class FilteringUiInfo(
-    val currentFilteringLabel: Int = R.string.label_all,
-    val noTasksLabel: Int = R.string.no_tasks_all,
-    val noTaskIconRes: Int = R.drawable.logo_no_fill,
+        val currentFilteringLabel: Int = R.string.label_all,
+        val noWorkoutsLabel: Int = R.string.no_workouts_all,
+        val noWorkoutIconRes: Int = R.drawable.logo_no_fill,
 )

@@ -31,116 +31,116 @@ import org.junit.runner.RunWith
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class TaskDaoTest {
+class WorkoutDaoTest {
 
     // using an in-memory database because the information stored here disappears when the
     // process is killed
-    private lateinit var database: ToDoDatabase
+    private lateinit var database: MyStrengthLogDatabase
 
     // Ensure that we use a new database for each test.
     @Before
     fun initDb() {
         database = Room.inMemoryDatabaseBuilder(
             getApplicationContext(),
-            ToDoDatabase::class.java
+            MyStrengthLogDatabase::class.java
         ).allowMainThreadQueries().build()
     }
     @Test
-    fun insertTaskAndGetById() = runTest {
-        // GIVEN - insert a task
-        val task = LocalTask(
+    fun insertWorkoutAndGetById() = runTest {
+        // GIVEN - insert a workout
+        val workout = LocalWorkout(
             title = "title",
             description = "description",
             id = "id",
             isCompleted = false,
         )
-        database.taskDao().upsert(task)
+        database.workoutDao().upsert(workout)
 
-        // WHEN - Get the task by id from the database
-        val loaded = database.taskDao().getById(task.id)
+        // WHEN - Get the workout by id from the database
+        val loaded = database.workoutDao().getById(workout.id)
 
         // THEN - The loaded data contains the expected values
-        assertNotNull(loaded as LocalTask)
-        assertEquals(task.id, loaded.id)
-        assertEquals(task.title, loaded.title)
-        assertEquals(task.description, loaded.description)
-        assertEquals(task.isCompleted, loaded.isCompleted)
+        assertNotNull(loaded as LocalWorkout)
+        assertEquals(workout.id, loaded.id)
+        assertEquals(workout.title, loaded.title)
+        assertEquals(workout.description, loaded.description)
+        assertEquals(workout.isCompleted, loaded.isCompleted)
     }
 
     @Test
-    fun insertTaskReplacesOnConflict() = runTest {
-        // Given that a task is inserted
-        val task = LocalTask(
+    fun insertWorkoutReplacesOnConflict() = runTest {
+        // Given that a workout is inserted
+        val workout = LocalWorkout(
             title = "title",
             description = "description",
             id = "id",
             isCompleted = false,
         )
-        database.taskDao().upsert(task)
+        database.workoutDao().upsert(workout)
 
-        // When a task with the same id is inserted
-        val newTask = LocalTask(
+        // When a workout with the same id is inserted
+        val newWorkout = LocalWorkout(
             title = "title2",
             description = "description2",
             isCompleted = true,
-            id = task.id
+            id = workout.id
         )
-        database.taskDao().upsert(newTask)
+        database.workoutDao().upsert(newWorkout)
 
         // THEN - The loaded data contains the expected values
-        val loaded = database.taskDao().getById(task.id)
-        assertEquals(task.id, loaded?.id)
+        val loaded = database.workoutDao().getById(workout.id)
+        assertEquals(workout.id, loaded?.id)
         assertEquals("title2", loaded?.title)
         assertEquals("description2", loaded?.description)
         assertEquals(true, loaded?.isCompleted)
     }
 
     @Test
-    fun insertTaskAndGetTasks() = runTest {
-        // GIVEN - insert a task
-        val task = LocalTask(
+    fun insertWorkoutAndGetWorkouts() = runTest {
+        // GIVEN - insert a workout
+        val workout = LocalWorkout(
             title = "title",
             description = "description",
             id = "id",
             isCompleted = false,
         )
-        database.taskDao().upsert(task)
+        database.workoutDao().upsert(workout)
 
-        // WHEN - Get tasks from the database
-        val tasks = database.taskDao().getAll()
+        // WHEN - Get workouts from the database
+        val workouts = database.workoutDao().getAll()
 
-        // THEN - There is only 1 task in the database, and contains the expected values
-        assertEquals(1, tasks.size)
-        assertEquals(tasks[0].id, task.id)
-        assertEquals(tasks[0].title, task.title)
-        assertEquals(tasks[0].description, task.description)
-        assertEquals(tasks[0].isCompleted, task.isCompleted)
+        // THEN - There is only 1 workout in the database, and contains the expected values
+        assertEquals(1, workouts.size)
+        assertEquals(workouts[0].id, workout.id)
+        assertEquals(workouts[0].title, workout.title)
+        assertEquals(workouts[0].description, workout.description)
+        assertEquals(workouts[0].isCompleted, workout.isCompleted)
     }
 
     @Test
-    fun updateTaskAndGetById() = runTest {
-        // When inserting a task
-        val originalTask = LocalTask(
+    fun updateWorkoutAndGetById() = runTest {
+        // When inserting a workout
+        val originalWorkout = LocalWorkout(
             title = "title",
             description = "description",
             id = "id",
             isCompleted = false,
         )
 
-        database.taskDao().upsert(originalTask)
+        database.workoutDao().upsert(originalWorkout)
 
-        // When the task is updated
-        val updatedTask = LocalTask(
+        // When the workout is updated
+        val updatedWorkout = LocalWorkout(
             title = "new title",
             description = "new description",
             isCompleted = true,
-            id = originalTask.id
+            id = originalWorkout.id
         )
-        database.taskDao().upsert(updatedTask)
+        database.workoutDao().upsert(updatedWorkout)
 
         // THEN - The loaded data contains the expected values
-        val loaded = database.taskDao().getById(originalTask.id)
-        assertEquals(originalTask.id, loaded?.id)
+        val loaded = database.workoutDao().getById(originalWorkout.id)
+        assertEquals(originalWorkout.id, loaded?.id)
         assertEquals("new title", loaded?.title)
         assertEquals("new description", loaded?.description)
         assertEquals(true, loaded?.isCompleted)
@@ -148,50 +148,50 @@ class TaskDaoTest {
 
     @Test
     fun updateCompletedAndGetById() = runTest {
-        // When inserting a task
-        val task = LocalTask(
+        // When inserting a workout
+        val workout = LocalWorkout(
             title = "title",
             description = "description",
             id = "id",
             isCompleted = true
         )
-        database.taskDao().upsert(task)
+        database.workoutDao().upsert(workout)
 
-        // When the task is updated
-        database.taskDao().updateCompleted(task.id, false)
+        // When the workout is updated
+        database.workoutDao().updateCompleted(workout.id, false)
 
         // THEN - The loaded data contains the expected values
-        val loaded = database.taskDao().getById(task.id)
-        assertEquals(task.id, loaded?.id)
-        assertEquals(task.title, loaded?.title)
-        assertEquals(task.description, loaded?.description)
+        val loaded = database.workoutDao().getById(workout.id)
+        assertEquals(workout.id, loaded?.id)
+        assertEquals(workout.title, loaded?.title)
+        assertEquals(workout.description, loaded?.description)
         assertEquals(false, loaded?.isCompleted)
     }
 
     @Test
-    fun deleteTaskByIdAndGettingTasks() = runTest {
-        // Given a task inserted
-        val task = LocalTask(
+    fun deleteWorkoutByIdAndGettingWorkouts() = runTest {
+        // Given a workout inserted
+        val workout = LocalWorkout(
             title = "title",
             description = "description",
             id = "id",
             isCompleted = false,
         )
-        database.taskDao().upsert(task)
+        database.workoutDao().upsert(workout)
 
-        // When deleting a task by id
-        database.taskDao().deleteById(task.id)
+        // When deleting a workout by id
+        database.workoutDao().deleteById(workout.id)
 
         // THEN - The list is empty
-        val tasks = database.taskDao().getAll()
-        assertEquals(true, tasks.isEmpty())
+        val workouts = database.workoutDao().getAll()
+        assertEquals(true, workouts.isEmpty())
     }
 
     @Test
-    fun deleteTasksAndGettingTasks() = runTest {
-        // Given a task inserted
-        database.taskDao().upsert(
-            LocalTask(
+    fun deleteWorkoutsAndGettingWorkouts() = runTest {
+        // Given a workout inserted
+        database.workoutDao().upsert(
+            LocalWorkout(
                 title = "title",
                 description = "description",
                 id = "id",
@@ -199,26 +199,26 @@ class TaskDaoTest {
             )
         )
 
-        // When deleting all tasks
-        database.taskDao().deleteAll()
+        // When deleting all workouts
+        database.workoutDao().deleteAll()
 
         // THEN - The list is empty
-        val tasks = database.taskDao().getAll()
-        assertEquals(true, tasks.isEmpty())
+        val workouts = database.workoutDao().getAll()
+        assertEquals(true, workouts.isEmpty())
     }
 
     @Test
-    fun deleteCompletedTasksAndGettingTasks() = runTest {
-        // Given a completed task inserted
-        database.taskDao().upsert(
-            LocalTask(title = "completed", description = "task", id = "id", isCompleted = true)
+    fun deleteCompletedWorkoutsAndGettingWorkouts() = runTest {
+        // Given a completed workout inserted
+        database.workoutDao().upsert(
+            LocalWorkout(title = "completed", description = "workout", id = "id", isCompleted = true)
         )
 
-        // When deleting completed tasks
-        database.taskDao().deleteCompleted()
+        // When deleting completed workouts
+        database.workoutDao().deleteCompleted()
 
         // THEN - The list is empty
-        val tasks = database.taskDao().getAll()
-        assertEquals(true, tasks.isEmpty())
+        val workouts = database.workoutDao().getAll()
+        assertEquals(true, workouts.isEmpty())
     }
 }

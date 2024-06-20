@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
+import com.example.android.architecture.blueprints.todoapp.data.source.local.MyStrengthLogDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -35,9 +35,9 @@ object DatabaseTestModule {
 
     @Singleton
     @Provides
-    fun provideDataBase(@ApplicationContext context: Context): ToDoDatabase {
+    fun provideDataBase(@ApplicationContext context: Context): MyStrengthLogDatabase {
         return Room
-            .inMemoryDatabaseBuilder(context.applicationContext, ToDoDatabase::class.java)
+            .inMemoryDatabaseBuilder(context.applicationContext, MyStrengthLogDatabase::class.java)
             .allowMainThreadQueries()
             .build()
     }
